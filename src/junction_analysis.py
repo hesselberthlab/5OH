@@ -12,8 +12,6 @@ import pandas as pd
 import pandas.rpy.common as com
 from collections import defaultdict
 
-umi_sam=sys.argv[1]
-
 umi_len = 8
 index_depth = 8		# desired index depth for pairwise analysis
 					# value must be <= umi_len
@@ -105,7 +103,14 @@ def write_r_dataframe(count_dict,outputfile):
 	f1 = open(outputfile,'w+')
 	print >>f1, r_dataframe
 
+def main(args=sys.argv[1:]):
+	umi_sam = args[0]
+	return junction_analysis(umi_sam)
 
-junction_analysis(umi_sam)
+if __name__ == '__main__':
+	sys.exit(main()) 
+
+
+
 
 
