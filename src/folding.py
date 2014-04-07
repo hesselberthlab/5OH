@@ -9,7 +9,7 @@ def tenfold(fasta):
     convert to binary output representing highest likelihood secondary  
     structure
     1 = double-stranded
-    2 = single-standed
+    0 = single-standed
     """
     for line in open(fasta):
         label, sequence = line.strip().split("\t")
