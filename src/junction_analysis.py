@@ -1,22 +1,25 @@
 #! /usr/bin/env python
-
-# Assess base bias at junction
+'''
+junction_analysis.spy:
+Assess base bias at junction
 # Site of linkage is defined as "0"
 # Negative index values are 5' (linker)
 # Positive index values are 3' (5OH sequence)
 # Intended input is umi-trimmed fastq file
-
+'''
 import sys
+from collections import defaultdict, Counter
+
 from pysam import Samfile
 import pandas as pd
 import pandas.rpy.common as com
-from collections import defaultdict
 
 umi_len = 8
 index_depth = 8     # desired index depth for pairwise analysis
                     # value must be <= umi_len
-index_counts = {}
-pair_counts = {}
+
+index_counts = defaultdict(Counter)
+pair_counts = defaultdict(Counter)
 
 def junction_analysis(umi_sam):
     """Run all necessary functions for data analysis.
@@ -24,7 +27,6 @@ def junction_analysis(umi_sam):
         Params:
             umi_sam (str): bam file after umitools trim & rmdup
     """
-    initiate_ds()
     for umi, seq in parse_samfile(umi_sam):
         compare_bases(umi, seq)
 
@@ -48,12 +50,6 @@ def parse_samfile(samfilename):
             umi = read.qname.split("_")[1]
             yield umi, read.seq
 
-def initiate_ds():
-    """Create data structures"""
-    for i in range(1,index_depth+1):
-        index_counts[i]=defaultdict(int)
-        index_counts[-i]=defaultdict(int)
-        pair_counts["pair-"+str(i)]=defaultdict(int)
 
 def compare_bases(umi, seq):
     """Compare base frequencies individually and pairwise
