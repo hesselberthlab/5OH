@@ -9,7 +9,7 @@ def parse_tenfold(tabfile):
     """Convert tenfold.py output to BED output
     "score" is tenfold output:
     1 = double-stranded
-    2 = single-standed
+    0 = single-standed
     """
     for line in open(tabfile):
         label, secondary = line.strip().split("\t")
