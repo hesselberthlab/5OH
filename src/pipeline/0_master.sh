@@ -28,7 +28,7 @@ for assembly in ${ASSEMBLIES[@]}; do
     # nothing ("common")
     export RESULT=$HOME/projects/5OH/results/common$DEBUG/$assembly
 
-    export BOWTIEIDX=$HOME/ref/genomes/$assembly/$assembly
+    export BOWTIEIDX=/vol3/home/jhessel/ref/genomes/$assembly/$assembly
     export CHROM_SIZES=$HOME/ref/genomes/$assembly/$assembly.chrom.sizes
     export GTF=$HOME/ref/genomes/$assembly/sgdGene.$assembly.gtf
     export FASTA=$HOME/ref/genomes/$assembly/$assembly.fa

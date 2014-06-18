@@ -15,21 +15,26 @@ sample=${SAMPLES[$(($LSB_JOBINDEX - 1))]}
 
 results=$RESULT/$sample
 bgresults=$RESULT/$sample/bedgraphs
+rtables=$RESULT/$sample/rtables
+if [[ ! -d $rtables ]]; then
+    mkdir -p $rtables
+fi
 
 strands=("pos" "neg")
 
-for strand in $strands; do
-    for bgfile in $(ls $bgresults/*$strand.CPMs.bg); do
-        rfile="$bgresults/$(basename $bgfile .bg).intersect.tab"
+for bgfile in $(ls $bgresults/*both.CPMs.bg); do
+    # Parse basename of file and create intersection files
+    posbg="$bgresults/$(basename $bgfile .both.CPMs.bg).pos.CPMs.bg"
+    negbg="$bgresults/$(basename $bgfile .both.CPMs.bg).neg.CPMs.bg"
+    
+    rfile="$rtables/$(basename $bgfile .bg).intersect.tab"
 
-        if [[ $strand == 'pos']]; then
-              bedtools intersect -a $bgfile -b $FULLGFF -wao \
-              | awk 'BEGIN{OFS="\t"; print "chr\tstart\tstop\tcount\tcat\tgene\tsite"} $10=="+" {split($8, a, ":"); print $1, $2, $3, $4, a[1], a[2], $1 ":" $2}' \
-              > $rfile
+    # intersect bg file with master GFF; parse appropriately
+    bedtools intersect -a $posbg -b $FULLGFF -wao \
+        | awk 'BEGIN{OFS="\t"; print "chr\tstart\tstop\tcount\tcat\tgene\tsite"} $10=="+" {split($8, a, ":"); print $1, $2, $3, $4, a[1], a[2], $1 ":" $2}' \
+        > $rfile
 
-        if [[ $strand == 'neg']]; then
-              bedtools intersect -a $bgfile -b $FULLGFF -wao \
-              | awk 'BEGIN{OFS="\t"; print "chr\tstart\tstop\tcount\tcat\tgene\tsite"} $10=="-" {split($8, a, ":"); print $1, $2, $3, $4, a[1], a[2], $1 ":" $2}' \
-              > $rfile
-    done
+    bedtools intersect -a $negbg -b $FULLGFF -wao \
+        | awk 'BEGIN{OFS="\t"} $10=="-" {split($8, a, ":"); print $1, $2, $3, $4, a[1], a[2], $1 ":" $2}' \
+        >> $rfile
 done
