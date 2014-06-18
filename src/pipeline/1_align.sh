@@ -44,7 +44,6 @@ for idx in ${!ALIGN_MODES[@]}; do
     if [[ ! -f $umibam ]]; then
         zcat $fastq \
             | bowtie $align_arg --sam $BOWTIEIDX -p 6 - \
-            2> $stats \
             | samtools view -ShuF4 - \
             | samtools sort -o - $sample.temp -m 8G \
             > $umibam
