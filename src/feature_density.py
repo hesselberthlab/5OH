@@ -95,8 +95,6 @@ def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
                                       s=True,
                                       null=0)
  
-    ipdb.set_trace()
-
     def keyfunc(interval):
         return int(interval.fields[GROUP_COLNUM-1])
 
