@@ -8,41 +8,88 @@ https://github.com/arq5x/bedtools-protocols/blob/master/bedtools.md#
 bp3-plot-transcription-factor-occupancy-surrounding-the-transcription-start-site
 
 '''
+import ipdb
 import sys
-from pybedtools import BedTool
+
+from pybedtools import BedTool, Interval
 
 __version__ = '$Revision$'
 
-def feature_density(feature_bedfilename, signal_bedgraph_filename,
-                    chromsize_filename, flank_size, window_resolution,
-                    map_operation, group_operation, verbose):
+BEDGRAPH_SIGNAL_COLNUM = 4
+GROUP_COLNUM = 5
+SUMMARY_COLNUM = 7
 
-    feature_bedtool = BedTool(feature_bedfile)
-    signal_bedtool = BedTool(signal_bedgraphfile)
+def feature_density(feature_bed_filename, signal_bedgraph_filename,
+                    chromsize_filename, window_size, feature_label, 
+                    window_resolution, map_operation, group_operation,
+                    verbose):
+
+    feature_bedtool = BedTool(feature_bed_filename)
+    signal_bedtool = BedTool(signal_bedgraph_filename)
 
     feature_slop = feature_bedtool.slop(b=window_size,
                                         g=chromsize_filename)
 
-    feature_windows = feature_slop.makewindows(w=window_resolution,
-                                               i=srcwinnum)
+    feature_windows = make_windows(feature_slop, window_resolution, verbose)
 
-    feature_map = feature_windows.map(c=signal_colnum, o=map_oper, null=0)
+    feature_map = make_map(feature_windows, signal_bedtool, map_operation,
+                           verbose)
 
-    group_col = 5
-    summary_col = 6
-    feature_grouped = feature_map.groupby(g=group_col, c=summary_col,
-                                          o=group_oper)
+    feature_grouped = feature_map.groupby(g=GROUP_COLNUM,
+                                          c=SUMMARY_COLNUM,
+                                          o=group_operation)
 
-def make_feature_windows(feature_bedtool, window_resolution, verbose):
+    pdb.set_trace()
 
-    feature_windows = feature_bedtool.makewindows(w=window_resolution,
-                                                  i=srcwinnum)
-    return result
+    for row in feature_grouped:
+        print '\t'.join(row)
+
+def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
+
+    if verbose:
+        print >>sys.stderr, ">> making map ... "
+
+    feature_map = windows_bedtool.map(b=signal_bedtool,
+                                      c=BEDGRAPH_SIGNAL_COLNUM,
+                                      o=map_operation,
+                                      null=0)
+  
+    def keyfunc(interval):
+        return int(interval.fields[GROUP_COLNUM-1])
+
+    return BedTool(sorted(feature_map, key=keyfunc))
+
+def make_windows(bedtool, window_resolution, verbose):
+    ''' 
+        Returns:
+            BedTool
+    '''
+    if verbose:
+        print >>sys.stderr, ">> making windows ... "
+
+    # generate the initial set of windows
+    windows = BedTool().window_maker(b=bedtool, w=window_resolution,
+                                     i='srcwinnum')
+
+    # sort by chrom, start and split the 4th field by "_"
+    results = []
+    for window in windows:
+        fs = window.fields
+        name, winnum = fs[3].split('_')
+        fields = [fs[0], int(fs[1]), int(fs[2]), name, winnum]
+        results.append(fields)
+
+    def keyfunc(fs):
+        return tuple([fs[0], fs[1]])
+
+    intervals = [Interval(*i) for i in sorted(results, key=keyfunc)]
+
+    return BedTool(intervals)
 
 def parse_options(args):
     from optparse import OptionParser, OptionGroup
 
-    usage = "%prog [OPTION]... FEATURE_BED SIGNAL_BEDGRAPH, CHROM_SIZE"
+    usage = "%prog [OPTION]... FEATURE_BED SIGNAL_BEDGRAPH CHROM_SIZE"
     version = "%%prog %s" % __version__
     description = ("")
 
@@ -51,14 +98,14 @@ def parse_options(args):
 
     group = OptionGroup(parser, "Variables")
 
-    group.add_option("--flank-size", action="store", type='int',
-        default=500, help="flank size (default: %default)")
+    group.add_option("--window-size", action="store", type='int',
+        default=1000, help="window size (default: %default)")
 
     group.add_option("--window-resolution", action="store", type='int',
         default=10, help="window resolution (default: %default)")
 
     group.add_option("--feature-label", action="store", type='str',
-        default='', help="feature label, reported in output"
+        default='label', help="feature label, reported in output"
         " (default: %default)")
 
     group.add_option("--map-operation", action="store", type='str',
@@ -85,18 +132,18 @@ def main(args=sys.argv[1:]):
 
     options, args = parse_options(args)
 
-    kwargs = {'flank_size':options.flank_size,
-              'window_res':options.window_resolution,
+    kwargs = {'window_size':options.window_size,
+              'window_resolution':options.window_resolution,
               'feature_label':options.feature_label,
-              'map_oper':options.map_oper,
-              'group_oper':options.group_oper,
+              'map_operation':options.map_operation,
+              'group_operation':options.group_operation,
               'verbose':options.verbose}
 
-    feature_bedfile = args[0]
-    signal_bedgraphfile = args[1]
-    chromsize_fielname = args[3]
+    feature_bed_filename = args[0]
+    signal_bedgraph_filename = args[1]
+    chromsize_filename = args[2]
 
-    return feature_density(feature_bedfilename, signal_bedgraphfilename,
+    return feature_density(feature_bed_filename, signal_bedgraph_filename,
                            chromsize_filename, **kwargs)
 
 if __name__ == '__main__':
