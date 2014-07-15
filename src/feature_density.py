@@ -109,11 +109,11 @@ def parse_options(args):
         " (default: %default)")
 
     group.add_option("--map-operation", action="store", type='str',
-        default='sum', help="map operation"
+        default='mean', help="map operation"
         " (default: %default)")
 
     group.add_option("--group-operation", action="store", type='str',
-        default='mean', help="group operation"
+        default='sum', help="group operation"
         " (default: %default)")
 
     group.add_option("-v", "--verbose", action="store_true",
