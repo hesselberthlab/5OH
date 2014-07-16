@@ -51,7 +51,7 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
 
     write_table(feature_grouped, feature_label, verbose)
 
-def add_strand_to_bedgraph(signal_bedtool, signal_strand, verbose):
+def add_strand_to_bedgraph(bedtool, strand, verbose):
 
     ''' rewrites bedgraph to bed6 format, adding strand.
     
@@ -64,27 +64,31 @@ def add_strand_to_bedgraph(signal_bedtool, signal_strand, verbose):
 
     result = []
 
-    for row in signal_bedtool:
+    for row in bedtool:
         # new fields are: chrom, start, end, name, score, strand
         fs = row.fields
 
-        fields = [fs[0], int(fs[1]), int(fs[2]), '.', fs[3],
-                  signal_strand]
+        fields = [fs[0], int(fs[1]), int(fs[2]), '.', fs[3], strand]
         result.append(Interval(*fields))
 
     return BedTool(result)
 
 def write_table(grouped_bedtool, label, verbose):
+    '''
+    Print results in tabular format
+    '''
+    header_fields = ('#pos','signal','label')
+    print '\t'.join(header_fields)
 
     fname = grouped_bedtool.TEMPFILES[-1]
     for row in reader(fname, header=['pos','signal']):
-        fields = [row['pos'], row['signal'], label]
+        fields = (row['pos'], row['signal'], label)
         print '\t'.join(fields)
 
 def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
     ''' 
-        Returns:
-            BedTool
+    Returns:
+        BedTool
     '''
     if verbose:
         print >>sys.stderr, ">> making map ... "
@@ -95,8 +99,6 @@ def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
                                       s=True,
                                       null=0)
  
-    ipdb.set_trace()
-
     def keyfunc(interval):
         return int(interval.fields[GROUP_COLNUM-1])
 
@@ -105,8 +107,8 @@ def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
 def make_windows(bedtool, window_resolution, signal_strand,
                  invert_strand, verbose):
     ''' 
-        Returns:
-            BedTool
+    Returns:
+        BedTool
     '''
     if verbose:
         print >>sys.stderr, ">> making windows ... "
