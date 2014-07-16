@@ -50,7 +50,9 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                           c=SUMMARY_COLNUM,
                                           o=group_operation)
 
-    write_table(feature_grouped, feature_label, verbose)
+    # ipdb.set_trace()
+
+    write_table(feature_grouped, signal_strand, feature_label, verbose)
 
 def add_strand_to_bedgraph(bedtool, strand, verbose):
 
@@ -74,17 +76,33 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
 
     return BedTool(result)
 
-def write_table(grouped_bedtool, label, verbose):
+def write_table(grouped_bedtool, signal_strand, label, verbose):
     '''
     Print results in tabular format
     '''
     header_fields = ('#pos','signal','label')
     print '\t'.join(header_fields)
 
+    # load the data
     fname = grouped_bedtool.TEMPFILES[-1]
+    data = []
+
     for row in reader(fname, header=['pos','signal']):
-        fields = (row['pos'], row['signal'], label)
-        print '\t'.join(fields)
+        fields = (row['pos'], row['signal'])
+        data.append(fields)
+
+    # rewrite signals based on strands
+    if signal_strand == '+':
+        # windows are in order, 5'->3'
+        signal = [datum[1] for datum in data]
+    else:
+        # flip the order of the signals
+        signal = reversed([datum[1] for datum in data])
+
+    positions = [datum[0] for datum in data]
+
+    for pos, signal in zip(positions, signal):
+        print '\t'.join([pos, signal, label])
 
 def make_map(windows_bedtool, signal_bedtool, map_operation,
              invert_strand, verbose):
@@ -109,7 +127,7 @@ def make_map(windows_bedtool, signal_bedtool, map_operation,
         args.update({'s':True})
 
     feature_map = windows_bedtool.map(**args)
- 
+
     def keyfunc(interval):
         return int(interval.fields[GROUP_COLNUM-1])
 
