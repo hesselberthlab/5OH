@@ -43,6 +43,7 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
     feature_map = make_map(feature_windows,
                            signal_stranded_bedtool,
                            map_operation,
+                           invert_strand,
                            verbose)
 
     feature_grouped = feature_map.groupby(g=GROUP_COLNUM,
@@ -85,7 +86,8 @@ def write_table(grouped_bedtool, label, verbose):
         fields = (row['pos'], row['signal'], label)
         print '\t'.join(fields)
 
-def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
+def make_map(windows_bedtool, signal_bedtool, map_operation,
+             invert_strand, verbose):
     ''' 
     Returns:
         BedTool
@@ -93,11 +95,20 @@ def make_map(windows_bedtool, signal_bedtool, map_operation, verbose):
     if verbose:
         print >>sys.stderr, ">> making map ... "
 
-    feature_map = windows_bedtool.map(b=signal_bedtool,
-                                      c=SIGNAL_COLNUM,
-                                      o=map_operation,
-                                      s=True,
-                                      null=0)
+    args = {'b':signal_bedtool,
+            'c':SIGNAL_COLNUM,
+            'o':map_operation,
+            'null':0}
+
+    # -s: Require same strandedness
+    # -S: Require different strandedness
+
+    if invert_strand:
+        args.update({'S':True})
+    else:
+        args.update({'s':True})
+
+    feature_map = windows_bedtool.map(**args)
  
     def keyfunc(interval):
         return int(interval.fields[GROUP_COLNUM-1])
@@ -118,8 +129,10 @@ def make_windows(bedtool, window_resolution, signal_strand,
     intervals = []
 
     for interval in bedtool:
+
         if not invert_strand and interval.strand == signal_strand:
             intervals.append(interval)
+
         elif invert_strand and interval.strand != signal_strand:
             intervals.append(interval)
 
@@ -132,12 +145,20 @@ def make_windows(bedtool, window_resolution, signal_strand,
 
     # sort by chrom, start and split the 4th field by "_"
     results = []
+
+    feature_strand = signal_strand
+    if invert_strand:
+        if feature_strand == '+':
+            feature_strand = '-'
+        else:
+            feature_strand = '+'
+
     for window in windows:
         fs = window.fields
 
         name, winnum = fs[3].split('_')
         fields = [fs[0], int(fs[1]), int(fs[2]),
-                  name, winnum, signal_strand]
+                  name, winnum, feature_strand]
 
         results.append(fields)
 
