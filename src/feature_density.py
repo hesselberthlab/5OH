@@ -24,6 +24,7 @@ SUMMARY_COLNUM = 7
 def feature_density(feature_bed_filename, signal_bedgraph_filename,
                     chromsize_filename, signal_strand, invert_strand,
                     window_size, feature_label, sample_label,
+                    library_type,
                     window_resolution, map_operation, group_operation,
                     verbose):
 
@@ -46,12 +47,15 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                            invert_strand,
                            verbose)
 
+    if verbose:
+        print >>sys.stderr, ">> grouping data ..."
+
     feature_grouped = feature_map.groupby(g=GROUP_COLNUM,
                                           c=SUMMARY_COLNUM,
                                           o=group_operation)
 
-    write_table(feature_grouped, signal_strand, feature_label,
-                sample_label, verbose)
+    write_table(feature_grouped, signal_strand, invert_strand,
+                feature_label, sample_label, library_type, verbose)
 
 def add_strand_to_bedgraph(bedtool, strand, verbose):
 
@@ -73,14 +77,15 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
         fields = [chrom, int(start), int(stop), '.', count, strand]
         intervals.append(Interval(*fields))
 
-    return BedTool(result)
+    return BedTool(intervals)
 
-def write_table(grouped_bedtool, signal_strand, feature_label,
-                sample_label, verbose):
+def write_table(grouped_bedtool, signal_strand, invert_strand, feature_label,
+                sample_label, library_type, verbose):
     '''
     Print results in tabular format
     '''
-    header_fields = ('#pos', 'signal', 'feature.label', 'sample.label')
+    header_fields = ('#pos', 'signal', 'library.type', 'feature.label',
+                     'feature.strand', 'sample.label')
     print '\t'.join(header_fields)
 
     # load the data
@@ -102,8 +107,16 @@ def write_table(grouped_bedtool, signal_strand, feature_label,
 
     positions = [pos for (pos, signal) in data]
 
+    report_strand = signal_strand
+    if invert_strand:
+        if report_strand == '+':
+            report_strand = '-'
+        else:
+            report_strand = '+'
+
     for pos, signal in zip(positions, signals):
-        print '\t'.join([pos, signal, feature_label, sample_label])
+        print '\t'.join([pos, signal, library_type, feature_label,
+                         report_strand, sample_label])
 
 def make_map(windows_bedtool, signal_bedtool, map_operation,
              invert_strand, verbose):
@@ -162,7 +175,7 @@ def make_windows(bedtool, window_resolution, signal_strand,
     stranded_bedtool = BedTool(intervals)
 
     # feature strand should be a single value
-    feature_strand = select_strand[0]
+    feature_strand = select_strands.pop()
 
     # generate the initial set of windows
     args = {'b':stranded_bedtool,
@@ -179,7 +192,7 @@ def make_windows(bedtool, window_resolution, signal_strand,
         chrom, start, end, win_field = window.fields
 
         name, winnum = win_field.split('_')
-        fields = [chrom, int(start), int(stop),
+        fields = [chrom, int(start), int(end),
                   name, winnum, feature_strand]
 
         intervals.append(Interval(*fields))
@@ -220,11 +233,15 @@ def parse_options(args):
         default=10, help="window resolution (default: %default)")
 
     group.add_option("--feature-label", action="store", type='str',
-        default='label', help="feature label, reported in output"
+        default='feature.label', help="feature label, reported in output"
         " (default: %default)")
 
     group.add_option("--sample-label", action="store", type='str',
-        default='label', help="sample label, reported in output"
+        default='sample.label', help="sample label, reported in output"
+        " (default: %default)")
+
+    group.add_option("--library-type", action="store", type='str',
+        default='libtype', help="library type, reported in output"
         " (default: %default)")
 
     group.add_option("--map-operation", action="store", type='str',
@@ -260,6 +277,7 @@ def main(args=sys.argv[1:]):
               'window_resolution':options.window_resolution,
               'feature_label':options.feature_label,
               'sample_label':options.sample_label,
+              'library_type':options.library_type,
               'map_operation':options.map_operation,
               'group_operation':options.group_operation,
               'verbose':options.verbose}
