@@ -23,7 +23,7 @@ SUMMARY_COLNUM = 7
 
 def feature_density(feature_bed_filename, signal_bedgraph_filename,
                     chromsize_filename, signal_strand, invert_strand,
-                    window_size, feature_label, 
+                    window_size, feature_label, sample_label,
                     window_resolution, map_operation, group_operation,
                     verbose):
 
@@ -50,9 +50,8 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                           c=SUMMARY_COLNUM,
                                           o=group_operation)
 
-    # ipdb.set_trace()
-
-    write_table(feature_grouped, signal_strand, feature_label, verbose)
+    write_table(feature_grouped, signal_strand, feature_label,
+                sample_label, verbose)
 
 def add_strand_to_bedgraph(bedtool, strand, verbose):
 
@@ -65,25 +64,27 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
     if verbose:
         print >>sys.stderr, ">> adding strand to bedgraph data ..."
 
-    result = []
+    intervals = []
 
     for row in bedtool:
         # new fields are: chrom, start, end, name, score, strand
-        fs = row.fields
+        chrom, start, stop, count = row.fields
 
-        fields = [fs[0], int(fs[1]), int(fs[2]), '.', fs[3], strand]
-        result.append(Interval(*fields))
+        fields = [chrom, int(start), int(stop), '.', count, strand]
+        intervals.append(Interval(*fields))
 
     return BedTool(result)
 
-def write_table(grouped_bedtool, signal_strand, label, verbose):
+def write_table(grouped_bedtool, signal_strand, feature_label,
+                sample_label, verbose):
     '''
     Print results in tabular format
     '''
-    header_fields = ('#pos','signal','label')
+    header_fields = ('#pos', 'signal', 'feature.label', 'sample.label')
     print '\t'.join(header_fields)
 
     # load the data
+    # XXX isn't there a better way do do this?
     fname = grouped_bedtool.TEMPFILES[-1]
     data = []
 
@@ -94,15 +95,15 @@ def write_table(grouped_bedtool, signal_strand, label, verbose):
     # rewrite signals based on strands
     if signal_strand == '+':
         # windows are in order, 5'->3'
-        signal = [datum[1] for datum in data]
+        signals = [signal for (pos, signal) in data]
     else:
         # flip the order of the signals
-        signal = reversed([datum[1] for datum in data])
+        signals = reversed([signal for (pos, signal) in data])
 
-    positions = [datum[0] for datum in data]
+    positions = [pos for (pos, signal) in data]
 
-    for pos, signal in zip(positions, signal):
-        print '\t'.join([pos, signal, label])
+    for pos, signal in zip(positions, signals):
+        print '\t'.join([pos, signal, feature_label, sample_label])
 
 def make_map(windows_bedtool, signal_bedtool, map_operation,
              invert_strand, verbose):
@@ -128,6 +129,7 @@ def make_map(windows_bedtool, signal_bedtool, map_operation,
 
     feature_map = windows_bedtool.map(**args)
 
+    # sort by the window number
     def keyfunc(interval):
         return int(interval.fields[GROUP_COLNUM-1])
 
@@ -145,47 +147,47 @@ def make_windows(bedtool, window_resolution, signal_strand,
     # select regions from bedtool that have matching strand. have to do
     # this here because make_windows() drops the strand field
     intervals = []
+    select_strands = set()
 
     for interval in bedtool:
 
         if not invert_strand and interval.strand == signal_strand:
             intervals.append(interval)
+            select_strands.add(interval.strand)
 
         elif invert_strand and interval.strand != signal_strand:
             intervals.append(interval)
+            select_strands.add(interval.strand)
 
     stranded_bedtool = BedTool(intervals)
 
+    # feature strand should be a single value
+    feature_strand = select_strand[0]
+
     # generate the initial set of windows
-    windows = BedTool().window_maker(b=stranded_bedtool,
-                                     w=window_resolution,
-                                     i='srcwinnum')
+    args = {'b':stranded_bedtool,
+            'w':window_resolution,
+            'i':'srcwinnum'}
 
-    # sort by chrom, start and split the 4th field by "_"
-    results = []
+    windows = BedTool().window_maker(**args)
 
-    feature_strand = signal_strand
-    if invert_strand:
-        if feature_strand == '+':
-            feature_strand = '-'
-        else:
-            feature_strand = '+'
+    # sort the results, split the 4th field to extract the original name
+    # and get the window number, and add the strand for the feature
+    intervals = []
 
     for window in windows:
-        fs = window.fields
+        chrom, start, end, win_field = window.fields
 
-        name, winnum = fs[3].split('_')
-        fields = [fs[0], int(fs[1]), int(fs[2]),
+        name, winnum = win_field.split('_')
+        fields = [chrom, int(start), int(stop),
                   name, winnum, feature_strand]
 
-        results.append(fields)
+        intervals.append(Interval(*fields))
 
-    def keyfunc(fs):
-        return tuple([fs[0], fs[1]])
+    def keyfunc(interval):
+        return tuple([interval.chrom, interval.start])
 
-    intervals = [Interval(*i) for i in sorted(results, key=keyfunc)]
-
-    return BedTool(intervals)
+    return BedTool(sorted(intervals, key=keyfunc))
 
 def parse_options(args):
     from optparse import OptionParser, OptionGroup
@@ -221,6 +223,10 @@ def parse_options(args):
         default='label', help="feature label, reported in output"
         " (default: %default)")
 
+    group.add_option("--sample-label", action="store", type='str',
+        default='label', help="sample label, reported in output"
+        " (default: %default)")
+
     group.add_option("--map-operation", action="store", type='str',
         default='mean', help="map operation"
         " (default: %default)")
@@ -253,6 +259,7 @@ def main(args=sys.argv[1:]):
               'window_size':options.window_size,
               'window_resolution':options.window_resolution,
               'feature_label':options.feature_label,
+              'sample_label':options.sample_label,
               'map_operation':options.map_operation,
               'group_operation':options.group_operation,
               'verbose':options.verbose}
