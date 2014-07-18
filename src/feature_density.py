@@ -10,6 +10,7 @@ bp3-plot-transcription-factor-occupancy-surrounding-the-transcription-start-site
 '''
 import ipdb
 import sys
+from itertools import groupby
 
 from toolshed import reader
 from pybedtools import BedTool, Interval
@@ -213,6 +214,8 @@ def make_windows(bedtool, window_resolution, signal_strand,
     # and get the window number, and add the strand for the feature
     intervals = []
 
+    # XXX update this step so that we can reverse window numbers on neg
+    # strand features
     for window in windows:
         chrom, start, end, win_field = window.fields
 
