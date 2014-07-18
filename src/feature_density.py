@@ -54,7 +54,8 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                           c=SUMMARY_COLNUM,
                                           o=group_operation)
 
-    write_table(feature_grouped, signal_strand, invert_strand,
+    write_table(feature_grouped, signal_strand,
+                window_size, window_resolution, invert_strand,
                 feature_label, sample_label, library_type, verbose)
 
 def add_strand_to_bedgraph(bedtool, strand, verbose):
@@ -79,17 +80,22 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
 
     return BedTool(intervals)
 
-def write_table(grouped_bedtool, signal_strand, invert_strand, feature_label,
+def write_table(grouped_bedtool, signal_strand,
+                window_size, window_resolution,
+                invert_strand, feature_label,
                 sample_label, library_type, verbose):
+    '''Print results in tabular format
+
+        Returns:
+            Nothing
     '''
-    Print results in tabular format
-    '''
-    header_fields = ('#pos', 'signal', 'library.type', 'feature.label',
+    header_fields = ('#pos', 'rel.pos', 'signal',
+                     'library.type', 'feature.label',
                      'feature.strand', 'sample.label')
     print '\t'.join(header_fields)
 
     # load the data
-    # XXX isn't there a better way do do this?
+    # XXX find a better way do do this
     fname = grouped_bedtool.TEMPFILES[-1]
     data = []
 
@@ -107,6 +113,8 @@ def write_table(grouped_bedtool, signal_strand, invert_strand, feature_label,
 
     positions = [pos for (pos, signal) in data]
 
+    xscale = make_x_scale(window_size, window_resolution)
+
     report_strand = signal_strand
     if invert_strand:
         if report_strand == '+':
@@ -114,15 +122,31 @@ def write_table(grouped_bedtool, signal_strand, invert_strand, feature_label,
         else:
             report_strand = '+'
 
-    for pos, signal in zip(positions, signals):
-        print '\t'.join([pos, signal, library_type, feature_label,
-                         report_strand, sample_label])
+    for pos, relpos, signal in zip(positions, scale, signals):
+        
+        fields = [pos, relpos, signal, library_type, feature_label,
+                  report_strand, sample_label]
+        print '\t'.join(map(str, fields))
+
+def make_x_scale(window_size, window_resolution):
+    ''' make the x scale for relative positions. for window_size 1000 and
+    window_resolution, scale is: -500, -490 ... 0, ... 490, 500
+
+    Returns:
+        Iterable
+    '''
+    halfsize = window_size / 2
+    xstart = -1 * halfsize
+    xend = halfsize + window_resolution
+    xscale = range(xstart, xend, window_resolution)
+
+    return xscale
 
 def make_map(windows_bedtool, signal_bedtool, map_operation,
              invert_strand, verbose):
     ''' 
     Returns:
-        BedTool
+        BedTool (sorted by window number)
     '''
     if verbose:
         print >>sys.stderr, ">> making map ... "
