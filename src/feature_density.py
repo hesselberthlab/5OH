@@ -122,8 +122,6 @@ def write_table(grouped_bedtool, signal_strand,
         else:
             report_strand = '+'
 
-    ipdb.set_trace()
-
     for pos, relpos, signal in zip(positions, xscale, signals):
         
         fields = [pos, relpos, signal, library_type, feature_label,
@@ -291,6 +289,9 @@ def parse_options(args):
 
     if len(args) != 3:
         parser.error("specify 3 required files")
+
+    if options.flank_size % options.window_resolution != 0:
+        parser.error("uneven window spacing, adjust params")
 
     return options, args
 
