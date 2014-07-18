@@ -23,7 +23,7 @@ SUMMARY_COLNUM = 7
 
 def feature_density(feature_bed_filename, signal_bedgraph_filename,
                     chromsize_filename, signal_strand, invert_strand,
-                    window_size, feature_label, sample_label,
+                    flank_size, feature_label, sample_label,
                     library_type,
                     window_resolution, map_operation, group_operation,
                     verbose):
@@ -35,7 +35,7 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                                      signal_strand,
                                                      verbose)
 
-    feature_slop = feature_bedtool.slop(b=window_size,
+    feature_slop = feature_bedtool.slop(b=flank_size,
                                         g=chromsize_filename)
 
     feature_windows = make_windows(feature_slop, window_resolution,
@@ -55,7 +55,7 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                           o=group_operation)
 
     write_table(feature_grouped, signal_strand,
-                window_size, window_resolution, invert_strand,
+                flank_size, window_resolution, invert_strand,
                 feature_label, sample_label, library_type, verbose)
 
 def add_strand_to_bedgraph(bedtool, strand, verbose):
@@ -81,7 +81,7 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
     return BedTool(intervals)
 
 def write_table(grouped_bedtool, signal_strand,
-                window_size, window_resolution,
+                flank_size, window_resolution,
                 invert_strand, feature_label,
                 sample_label, library_type, verbose):
     '''Print results in tabular format
@@ -113,7 +113,7 @@ def write_table(grouped_bedtool, signal_strand,
 
     positions = [pos for (pos, signal) in data]
 
-    xscale = make_x_scale(window_size, window_resolution)
+    xscale = make_x_scale(flank_size, window_resolution)
 
     report_strand = signal_strand
     if invert_strand:
@@ -122,31 +122,34 @@ def write_table(grouped_bedtool, signal_strand,
         else:
             report_strand = '+'
 
-    for pos, relpos, signal in zip(positions, scale, signals):
+    ipdb.set_trace()
+
+    for pos, relpos, signal in zip(positions, xscale, signals):
         
         fields = [pos, relpos, signal, library_type, feature_label,
                   report_strand, sample_label]
         print '\t'.join(map(str, fields))
 
-def make_x_scale(window_size, window_resolution):
-    ''' make the x scale for relative positions. for window_size 1000 and
-    window_resolution, scale is: -500, -490 ... 0, ... 490, 500
+def make_x_scale(flank_size, window_resolution):
+    ''' make the x scale for relative positions. for flank_size 500 and
+        window_resolution, scale is: -500, -490 ... 0, ... 490, 500
 
-    Returns:
-        Iterable
+        Returns:
+            Iterable
     '''
-    halfsize = window_size / 2
-    xstart = -1 * halfsize
-    xend = halfsize + window_resolution
+    xstart = -1 * flank_size
+    xend = flank_size + window_resolution
     xscale = range(xstart, xend, window_resolution)
 
     return xscale
 
 def make_map(windows_bedtool, signal_bedtool, map_operation,
              invert_strand, verbose):
-    ''' 
-    Returns:
-        BedTool (sorted by window number)
+    ''' maps signals onto bed regions using map_operation. mapping takes
+        strand comparison into account.
+
+        Returns:
+            BedTool, sorted by window number
     '''
     if verbose:
         print >>sys.stderr, ">> making map ... "
@@ -250,8 +253,8 @@ def parse_options(args):
         default=False, help="invert strand signal match if mismatched " 
                            "(default: %default)")
 
-    group.add_option("--window-size", action="store", type='int',
-        default=1000, help="window size (default: %default)")
+    group.add_option("--flank-size", action="store", type='int',
+        default=500, help="flank size (default: %default)")
 
     group.add_option("--window-resolution", action="store", type='int',
         default=10, help="window resolution (default: %default)")
@@ -297,7 +300,7 @@ def main(args=sys.argv[1:]):
 
     kwargs = {'signal_strand':options.signal_strand,
               'invert_strand':options.invert_strand,
-              'window_size':options.window_size,
+              'flank_size':options.flank_size,
               'window_resolution':options.window_resolution,
               'feature_label':options.feature_label,
               'sample_label':options.sample_label,
