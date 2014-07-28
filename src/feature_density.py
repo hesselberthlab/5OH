@@ -114,7 +114,7 @@ def write_table(grouped_bedtool, flank_size, window_resolution,
     '''
     header_fields = ('#pos', 'rel.pos', 'signal',
                      'library.type', 'feature.label',
-                     'feature.strand', 'sample.label')
+                     'sample.label')
     print '\t'.join(header_fields)
 
     # load the data
