@@ -22,28 +22,33 @@ SIGNAL_COLNUM = 5
 GROUP_COLNUM = 5
 SUMMARY_COLNUM = 7
 
-def feature_density(feature_bed_filename, signal_bedgraph_filename,
-                    chromsize_filename, signal_strand, invert_strand,
-                    flank_size, feature_label, sample_label,
-                    library_type,
+def feature_density(feature_bed_filename,
+                    chromsize_filename,
+                    pos_bedgraph_filename,
+                    neg_bedgraph_filename,
+                    invert_strand, flank_size, feature_label,
+                    sample_label, library_type,
                     window_resolution, map_operation, group_operation,
                     verbose):
 
     feature_bedtool = BedTool(feature_bed_filename)
-    signal_bedtool = BedTool(signal_bedgraph_filename)
+    validate_features(feature_bedtool)
 
-    signal_stranded_bedtool = add_strand_to_bedgraph(signal_bedtool,
-                                                     signal_strand,
-                                                     verbose)
+    pos_signal_bedtool = BedTool(pos_bedgraph_filename)
+    neg_signal_bedtool = BedTool(neg_bedgraph_filename)
+
+    signal_bedtool = add_strand_to_bedgraph(pos_signal_bedtool,
+                                            neg_signal_bedtool,
+                                            verbose)
 
     feature_slop = feature_bedtool.slop(b=flank_size,
                                         g=chromsize_filename)
 
     feature_windows = make_windows(feature_slop, window_resolution,
-                                   signal_strand, invert_strand, verbose)
+                                   invert_strand, verbose)
 
     feature_map = make_map(feature_windows,
-                           signal_stranded_bedtool,
+                           signal_bedtool,
                            map_operation,
                            invert_strand,
                            verbose)
@@ -55,11 +60,27 @@ def feature_density(feature_bed_filename, signal_bedgraph_filename,
                                           c=SUMMARY_COLNUM,
                                           o=group_operation)
 
-    write_table(feature_grouped, signal_strand,
-                flank_size, window_resolution, invert_strand,
-                feature_label, sample_label, library_type, verbose)
+    write_table(feature_grouped, flank_size, window_resolution,
+                invert_strand, feature_label, sample_label, library_type,
+                verbose)
 
-def add_strand_to_bedgraph(bedtool, strand, verbose):
+def validate_features(bedtool):
+    ''' validate feature BED file.
+
+        Returns:
+            Nothing
+    ''' 
+    named_features = True
+    for row in bedtool:
+        # name is 4th field
+        if row.fields[3] == '.':
+            named_features = False
+
+    if not named_features:
+        print >>sys.stderr, ">> error: unnamed features in BED file"
+        sys.exit(1)
+
+def add_strand_to_bedgraph(pos_bedtool, neg_bedtool, verbose):
 
     ''' rewrites bedgraph to bed6 format, adding strand.
     
@@ -70,19 +91,20 @@ def add_strand_to_bedgraph(bedtool, strand, verbose):
     if verbose:
         print >>sys.stderr, ">> adding strand to bedgraph data ..."
 
+    groups = ((pos_bedtool, '+'),
+              (neg_bedtool, '-'))
+    
     intervals = []
 
-    for row in bedtool:
-        # new fields are: chrom, start, end, name, score, strand
-        chrom, start, stop, count = row.fields
-
-        fields = [chrom, int(start), int(stop), '.', count, strand]
-        intervals.append(Interval(*fields))
+    for bedtool, strand in groups:
+        for row in bedtool:
+            chrom, start, stop, count = row.fields
+            fields = [chrom, int(start), int(stop), '.', count, strand]
+            intervals.append(Interval(*fields))
 
     return BedTool(intervals)
 
-def write_table(grouped_bedtool, signal_strand,
-                flank_size, window_resolution,
+def write_table(grouped_bedtool, flank_size, window_resolution,
                 invert_strand, feature_label,
                 sample_label, library_type, verbose):
     '''Print results in tabular format
@@ -96,7 +118,6 @@ def write_table(grouped_bedtool, signal_strand,
     print '\t'.join(header_fields)
 
     # load the data
-    # XXX find a better way do do this
     fname = grouped_bedtool.TEMPFILES[-1]
     data = []
 
@@ -104,29 +125,12 @@ def write_table(grouped_bedtool, signal_strand,
         fields = (row['pos'], row['signal'])
         data.append(fields)
 
-    # rewrite signals based on strands
-    if signal_strand == '+':
-        # windows are in order, 5'->3'
-        signals = [signal for (pos, signal) in data]
-    else:
-        # flip the order of the signals
-        signals = reversed([signal for (pos, signal) in data])
-
-    positions = [pos for (pos, signal) in data]
-
     xscale = make_x_scale(flank_size, window_resolution)
 
-    report_strand = signal_strand
-    if invert_strand:
-        if report_strand == '+':
-            report_strand = '-'
-        else:
-            report_strand = '+'
-
-    for pos, relpos, signal in zip(positions, xscale, signals):
+    for relpos, (pos, signal) in zip(xscale, data):
         
         fields = [pos, relpos, signal, library_type, feature_label,
-                  report_strand, sample_label]
+                  sample_label]
         print '\t'.join(map(str, fields))
 
 def make_x_scale(flank_size, window_resolution):
@@ -174,9 +178,9 @@ def make_map(windows_bedtool, signal_bedtool, map_operation,
 
     return BedTool(sorted(feature_map, key=keyfunc))
 
-def make_windows(bedtool, window_resolution, signal_strand,
-                 invert_strand, verbose):
+def make_windows(bedtool, window_resolution, invert_strand, verbose):
     ''' 
+    Make windows based on specified window_resultion
     Returns:
         BedTool
     '''
@@ -185,50 +189,82 @@ def make_windows(bedtool, window_resolution, signal_strand,
 
     # select regions from bedtool that have matching strand. have to do
     # this here because make_windows() drops the strand field
+
     intervals = []
-    select_strands = set()
+    window_intervals = []
+    for strand in BEDGRAPH_STRANDS:
+        for interval in bedtool:
 
-    for interval in bedtool:
+            if not invert_strand and interval.strand == strand:
+                intervals.append(interval)
 
-        if not invert_strand and interval.strand == signal_strand:
-            intervals.append(interval)
-            select_strands.add(interval.strand)
+            elif invert_strand and interval.strand != strand:
+                intervals.append(interval)
 
-        elif invert_strand and interval.strand != signal_strand:
-            intervals.append(interval)
-            select_strands.add(interval.strand)
+        stranded_bedtool = BedTool(intervals)
 
-    stranded_bedtool = BedTool(intervals)
+        # generate the initial set of windows
+        args = {'b':stranded_bedtool,
+                'w':window_resolution,
+                'i':'srcwinnum'}
 
-    # feature strand should be a single value
-    feature_strand = select_strands.pop()
+        windows = BedTool().window_maker(**args)
 
-    # generate the initial set of windows
-    args = {'b':stranded_bedtool,
-            'w':window_resolution,
-            'i':'srcwinnum'}
+        # split the 4th field to extract the original name
+        # and get the window number, and add the strand for the feature
+        for window in windows:
+            chrom, start, end, win_field = window.fields
 
-    windows = BedTool().window_maker(**args)
+            name, winnum = win_field.split('_')
+            fields = [chrom, int(start), int(end),
+                      name, winnum, strand]
 
-    # sort the results, split the 4th field to extract the original name
-    # and get the window number, and add the strand for the feature
-    intervals = []
+            window_intervals.append(Interval(*fields))
 
-    # XXX update this step so that we can reverse window numbers on neg
-    # strand features
-    for window in windows:
-        chrom, start, end, win_field = window.fields
+    def groupkeyfunc(interval):
+        # group by name and strand
+        return tuple([interval.fields[3], interval.fields[5]])
 
-        name, winnum = win_field.split('_')
-        fields = [chrom, int(start), int(end),
-                  name, winnum, feature_strand]
+    grouped_intervals = groupby(window_intervals, key=groupkeyfunc)
 
-        intervals.append(Interval(*fields))
+    reorder_intervals = []
 
-    def keyfunc(interval):
+    for group, intervals in grouped_intervals:
+
+        name, strand = group
+
+        if strand == '+':
+            reorder_intervals.extend(intervals)
+
+        elif strand == '-':
+            rev_intervals = reverse_interval_windows(intervals)
+            reorder_intervals.extend(rev_intervals)
+
+    def sortkeyfunc(interval):
         return tuple([interval.chrom, interval.start])
 
-    return BedTool(sorted(intervals, key=keyfunc))
+    return BedTool(sorted(reorder_intervals, key=sortkeyfunc))
+
+def reverse_interval_windows(intervals):
+    '''
+    Returns:
+        list of Intervals
+    '''
+    # 5th field is the window number
+    intervals = tuple(intervals)
+
+    rev_winnums = reversed([interval.fields[4] for interval in intervals])
+
+    reordered = []
+    for interval, winnum in zip(intervals, rev_winnums):
+        interval_name = interval.fields[3]
+        new_interval = Interval(interval.chrom, interval.start,
+                                interval.end, interval_name,
+                                winnum, interval.strand)
+
+        reordered.append(new_interval)
+
+    return reordered
 
 def parse_options(args):
     from optparse import OptionParser, OptionGroup
@@ -242,8 +278,12 @@ def parse_options(args):
 
     group = OptionGroup(parser, "Required")
 
-    group.add_option("--signal-strand", action="store", type='str',
-        default=None, help="strand for bedgraph signal ('+' or '-') "
+    group.add_option("-p", "--pos-bedgraph", action="store", type='str',
+        default=None, help="pos strand bedgraph signal "
+                           "(default: %default)")
+
+    group.add_option("-n", "--neg-bedgraph", action="store", type='str',
+        default=None, help="neg strand bedgraph signal "
                            "(default: %default)")
 
     parser.add_option_group(group)
@@ -287,11 +327,11 @@ def parse_options(args):
 
     options, args = parser.parse_args(args)
 
-    if not options.signal_strand:
-        parser.error("specify strand for bedgraph")
+    if not options.pos_bedgraph or not options.neg_bedgraph:
+        parser.error("specify stranded bedgraph data")
 
-    if len(args) != 3:
-        parser.error("specify 3 required files")
+    if len(args) != 2:
+        parser.error("specify 32required files")
 
     if options.flank_size % options.window_resolution != 0:
         parser.error("uneven window spacing, adjust params")
@@ -302,7 +342,8 @@ def main(args=sys.argv[1:]):
 
     options, args = parse_options(args)
 
-    kwargs = {'signal_strand':options.signal_strand,
+    kwargs = {'pos_bedgraph_filename':options.pos_bedgraph,
+              'neg_bedgraph_filename':options.neg_bedgraph,
               'invert_strand':options.invert_strand,
               'flank_size':options.flank_size,
               'window_resolution':options.window_resolution,
@@ -314,11 +355,11 @@ def main(args=sys.argv[1:]):
               'verbose':options.verbose}
 
     feature_bed_filename = args[0]
-    signal_bedgraph_filename = args[1]
-    chromsize_filename = args[2]
+    chromsize_filename = args[1]
 
-    return feature_density(feature_bed_filename, signal_bedgraph_filename,
-                           chromsize_filename, **kwargs)
+    return feature_density(feature_bed_filename, 
+                           chromsize_filename,
+                           **kwargs)
 
 if __name__ == '__main__':
     sys.exit(main()) 
