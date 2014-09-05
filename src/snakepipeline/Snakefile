@@ -1,23 +1,25 @@
 # Snakemake-based pipeline for 5OH-Seq in yeast
-# should ideally be able to just change a few variables in the beginning, and run snakemake to generate output
+#
 # Usage:
-# snakemake --cluster bsub
+# - Set experiment-specific variables
+# - Submit "snakemake -j" shell command using bsub < run.sh
+# - Enjoy life.
 
 # Experiment-specific variables
-user = "/vol2/home/speach"  # change path to your home directory
-DATA = "%s/projects/5OH/data/snaketest/" % user
-SAMPLES = "SP8 SP7".split()
-DESCRIPS = "4742_DMSO 4742_Tm".split()
-ASSEMBLY = "sacCer1"
-RESULT = "%s/projects/5OH/results/20140904_snaketest/" % user
-UMI = "NNNNNNNN"
-ALIGN_MODES = ("std")
-ALIGN_ARGS = ("")
+user = "/vol2/home/speach"                        # path to your home directory
+DATA = "%s/projects/5OH/data/snaketest/" % user   # location of raw data
+SAMPLES = "SP8 SP7".split()                       # sample names
+DESCRIPS = "4742_DMSO 4742_Tm".split()            # sample descriptions
+ASSEMBLY = "sacCer1"                              # assembly for alignment
+RESULT = "%s/projects/5OH/results/snaketest/" % user   # directory for results
+UMI = "NNNNNNNN"                                  # UMI to be removed
+ALIGN_MODE = "std"                                # name of alignment mode (will be included in filename)
+ALIGN_ARGS = ""                                   # alignment arguments passed to bowtie
 
 
 # Consistent variables
 source = "/vol2/home/speach"
-PIPELINE = "%s/devel/5OH/src/pipeline" % source
+PIPELINE = "%s/devel/5OH/src/snakepipeline" % source
 BOWTIEIDX = "%s/ref/genomes/%s/%s" % (source, ASSEMBLY, ASSEMBLY)
 CHROM_SIZES = "%s/ref/genomes/%s/%s.chrom.sizes" % (source, ASSEMBLY, ASSEMBLY)
 
@@ -31,16 +33,16 @@ UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source
 # Functions
 
 rule all:
-    input: expand("{data}{sample}.umi.fq.gz", data=DATA, sample=SAMPLES)
-    #input: expand("{result}/{sample}.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODES)
+    input: expand("{result}{sample}.UMIs_not_removed.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
 
 rule trim_umi:
     input: DATA + "{sample}.fq.gz"
-    output: DATA + "{sample}.umi.fq.gz"
     params: UMI
+    output: DATA + "{sample}.umi.fq.gz"
     shell: "bash trim_umi.sh {input} {params} {output}"
 
-#rule align:
-#    input: DATA + "{sample}.umi.fq.gz"
-#    output: RESULT + "{sample}.align.{align_mode}.bam"
-#    shell: "bsub < s1_align.sh"
+rule align:
+    input: DATA + "{sample}.umi.fq.gz"
+    params: BOWTIEIDX, ALIGN_ARGS
+    output: RESULT + "{sample}.UMIs_not_removed.align." + ALIGN_MODE + ".bam"
+    shell: "bash align.sh {input} {params} {output}"
