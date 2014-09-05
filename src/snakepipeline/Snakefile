@@ -6,15 +6,15 @@
 # - Enjoy life.
 
 # Experiment-specific variables
-user = "/vol2/home/speach"                        # path to your home directory
-DATA = "%s/projects/5OH/data/snaketest/" % user   # location of raw data
-SAMPLES = "SP8 SP7".split()                       # sample names
-DESCRIPS = "4742_DMSO 4742_Tm".split()            # sample descriptions
-ASSEMBLY = "sacCer1"                              # assembly for alignment
-RESULT = "%s/projects/5OH/results/snaketest/" % user   # directory for results
-UMI = "NNNNNNNN"                                  # UMI to be removed
-ALIGN_MODE = "std"                                # name of alignment mode (will be included in filename)
-ALIGN_ARGS = ""                                   # alignment arguments passed to bowtie
+user = "/vol2/home/speach"                            # path to your home directory
+DATA = "%s/projects/5OH/data/snaketest/" % user       # location of raw data
+SAMPLES = "SP8 SP7".split()                           # sample names
+DESCRIPS = "4742_DMSO 4742_Tm".split()                # sample descriptions
+ASSEMBLY = "sacCer1"                                  # assembly for alignment
+RESULT = "%s/projects/5OH/results/snaketest/" % user  # directory for results
+UMI = "NNNNNNNN"                                      # UMI to be removed
+ALIGN_MODE = "std"                                    # name of alignment mode (will be included in filename)
+ALIGN_ARGS = ""                                       # alignment arguments passed to bowtie
 
 
 # Consistent variables
@@ -30,11 +30,13 @@ FULLGFF = "%s/ref/genomes/sacCer1/sacCer1.fuller.bed" % source
 MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.mrna.20windows.bed" % source
 UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source
 
-# Functions
 
+
+# The input to the first rule should be the desired output of the full workflow
 rule all:
-    input: expand("{result}{sample}.UMIs_not_removed.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
+    input: expand("{result}{sample}.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
 
+# The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
     input: DATA + "{sample}.fq.gz"
     params: UMI
@@ -46,3 +48,9 @@ rule align:
     params: BOWTIEIDX, ALIGN_ARGS
     output: RESULT + "{sample}.UMIs_not_removed.align." + ALIGN_MODE + ".bam"
     shell: "bash align.sh {input} {params} {output}"
+
+rule remove_duplicate_umis:
+    input: RESULT + "{sample}.UMIs_not_removed.align." + ALIGN_MODE + ".bam"
+    params: RESULT + "{sample}.umi-report.align." + ALIGN_MODE + ".bed.gz"
+    output: RESULT + "{sample}.align." + ALIGN_MODE + ".bam"
+    shell: "bash rm_dup_umi.sh {input} {params} {output}"
