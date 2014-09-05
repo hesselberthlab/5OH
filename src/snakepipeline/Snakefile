@@ -1,9 +1,11 @@
 # Snakemake-based pipeline for 5OH-Seq in yeast
 # should ideally be able to just change a few variables in the beginning, and run snakemake to generate output
+# Usage:
+# snakemake --cluster bsub
 
 # Experiment-specific variables
 user = "/vol2/home/speach"  # change path to your home directory
-DATA = "%s/projects/5OH/data/Rep1/" % user
+DATA = "%s/projects/5OH/data/snaketest/" % user
 SAMPLES = "SP8 SP7".split()
 DESCRIPS = "4742_DMSO 4742_Tm".split()
 ASSEMBLY = "sacCer1"
@@ -29,9 +31,16 @@ UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source
 # Functions
 
 rule all:
-   input:  expand("{result}/{sample}.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODES)
+    input: expand("{data}{sample}.umi.fq.gz", data=DATA, sample=SAMPLES)
+    #input: expand("{result}/{sample}.align.{align_mode}.bam", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODES)
 
-rule align:
-    input: DATA + "{sample}.umi.fq.gz"
-    output: RESULT + "{sample}.align.{align_mode}.bam"
-    shell: "bsub < s1_align.sh"
+rule trim_umi:
+    input: DATA + "{sample}.fq.gz"
+    output: DATA + "{sample}.umi.fq.gz"
+    params: UMI
+    shell: "bash trim_umi.sh {input} {params} {output}"
+
+#rule align:
+#    input: DATA + "{sample}.umi.fq.gz"
+#    output: RESULT + "{sample}.align.{align_mode}.bam"
+#    shell: "bsub < s1_align.sh"
