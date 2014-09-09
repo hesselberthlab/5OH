@@ -8,10 +8,12 @@
 # Experiment-specific variables
 user = "/vol2/home/speach"                            # path to your home directory
 DATA = "%s/projects/5OH/data/snaketest/" % user       # location of raw data
+PROJECTDIR = "projects/5OH/results/snaketest"         # directory for results
+RESULT = "%s/%s/" % (user, PROJECTDIR)                 # full directory path for results
+
 SAMPLES = "SP8 SP7".split()                           # sample names
 #DESCRIPS = "4742_DMSO 4742_Tm".split()               # sample descriptions
 ASSEMBLY = "sacCer1"                                  # assembly for alignment
-RESULT = "%s/projects/5OH/results/snaketest/" % user  # directory for results
 UMI = "NNNNNNNN"                                      # UMI to be removed
 ALIGN_MODE = "std"                                    # name of alignment mode (will be included in filename)
 ALIGN_ARGS = ""                                       # alignment arguments passed to bowtie
@@ -19,11 +21,14 @@ ALIGN_ARGS = ""                                       # alignment arguments pass
 
 
 # Consistent variables
-source = "/vol2/home/speach"
-PIPELINE = "%s/devel/5OH/src/snakepipeline" % source
-BOWTIEIDX = "%s/ref/genomes/%s/%s" % (source, ASSEMBLY, ASSEMBLY)
-CHROM_SIZES = "%s/ref/genomes/%s/%s.chrom.sizes" % (source, ASSEMBLY, ASSEMBLY)
-STRANDS = "both pos neg".split()
+source = "/vol2/home/speach"                          # location of source scrimpts
+PIPELINE = "%s/devel/5OH/src/snakepipeline" % source  # path to snakepipeline
+BOWTIEIDX = "%s/ref/genomes/%s/%s" % (source, ASSEMBLY, ASSEMBLY)               # bowtie index
+CHROM_SIZES = "%s/ref/genomes/%s/%s.chrom.sizes" % (source, ASSEMBLY, ASSEMBLY) # chromosome sizes
+STRANDS = "both pos neg".split()                      # Strands
+SANDBOX = "http://amc-sandbox.ucdenver.edu/~%s/" % user     # path to webspace on www
+WEBFOLDER = "%s/public_html/" % user                  # path to web folder on cluster
+
 
 # Consistent variables (currently specific to yeast)
 GTF = "%s/ref/genomes/%s/sgdGene.%s.gtf" % (source, ASSEMBLY, ASSEMBLY)
@@ -34,7 +39,7 @@ UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source
 
 # The input to the first rule should be the desired output of the full workflow
 rule all:
-    input: expand("{result}{sample}.align.{align_mode}.strand.all.CPMs.bg", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
+    input: expand("{result}{sample}.align.{align_mode}.gffintersect.tab", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
 
 # The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
@@ -55,10 +60,16 @@ rule remove_duplicate_umis:
     output: RESULT + "{sample}.align." + ALIGN_MODE + ".bam"
     shell: "bash rm_dup_umi.sh {input} {params} {output}"
 
-rule coverage:
+rule coverage_and_web:
     input: RESULT + "{sample}.align." + ALIGN_MODE + ".bam"
-    params: CHROM_SIZES, RESULT
-    output: RESULT + "{sample}.align." + ALIGN_MODE + ".strand.all.CPMs.bg",
-            RESULT + "{sample}.align." + ALIGN_MODE + ".strand.pos.CPMs.bg",
+    params: CHROM_SIZES, RESULT, WEBFOLDER, PROJECTDIR
+    output: RESULT + "{sample}.align." + ALIGN_MODE + ".strand.pos.CPMs.bg",
             RESULT + "{sample}.align." + ALIGN_MODE + ".strand.neg.CPMs.bg"
     shell: "bash coverage.sh {input} {params}"
+
+rule gff_intersect:
+    input: RESULT + "{sample}.align." + ALIGN_MODE + ".strand.pos.CPMs.bg",
+           RESULT + "{sample}.align." + ALIGN_MODE + ".strand.neg.CPMs.bg"
+    params: FULLGFF
+    output: RESULT + "{sample}.align." + ALIGN_MODE + ".gffintersect.tab"
+    shell: "bash gff_intersect.sh {input} {params} {output}"
