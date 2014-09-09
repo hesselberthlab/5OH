@@ -9,7 +9,8 @@
 user = "/vol2/home/speach"                            # path to your home directory
 DATA = "%s/projects/5OH/data/snaketest/" % user       # location of raw data
 PROJECTDIR = "projects/5OH/results/snaketest"         # directory for results
-RESULT = "%s/%s/" % (user, PROJECTDIR)                 # full directory path for results
+RESULT = "%s/%s/" % (user, PROJECTDIR)                # full directory path for results
+RGRAPHS = "%srgraphs/" % RESULT                       # full directory path for R graph results
 
 SAMPLES = "SP8 SP7".split()                           # sample names
 #DESCRIPS = "4742_DMSO 4742_Tm".split()               # sample descriptions
@@ -31,15 +32,15 @@ WEBFOLDER = "%s/public_html/" % user                  # path to web folder on cl
 
 
 # Consistent variables (currently specific to yeast)
-GTF = "%s/ref/genomes/%s/sgdGene.%s.gtf" % (source, ASSEMBLY, ASSEMBLY)
-FASTA = "%s/ref/genomes/%s/%s.fa" % (source, ASSEMBLY, ASSEMBLY)
-FULLGFF = "%s/ref/genomes/sacCer1/sacCer1.fuller.bed" % source
-MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.mrna.20windows.bed" % source
-UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source
+GTF = "%s/ref/genomes/%s/sgdGene.%s.gtf" % (source, ASSEMBLY, ASSEMBLY)       # GTF file from database
+FASTA = "%s/ref/genomes/%s/%s.fa" % (source, ASSEMBLY, ASSEMBLY)              # Fasta of specific assembly
+FULLGFF = "%s/ref/genomes/sacCer1/sacCer1.fuller.bed" % source                # GFF file containing "all" gene species
+MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.mrna.20windows.bed" % source    # mRNA split into 20 bins
+UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source       # UTRs split into 2 bins
 
 # The input to the first rule should be the desired output of the full workflow
 rule all:
-    input: expand("{result}{sample}.align.{align_mode}.gffintersect.tab", result=RESULT, sample=SAMPLES, align_mode=ALIGN_MODE)
+    input: expand("{rgraphs}{sample}.align.{align_mode}.windows.tab", rgraphs=RGRAPHS, sample=SAMPLES, align_mode=ALIGN_MODE)
 
 # The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
@@ -67,9 +68,21 @@ rule coverage_and_web:
             RESULT + "{sample}.align." + ALIGN_MODE + ".strand.neg.CPMs.bg"
     shell: "bash coverage.sh {input} {params}"
 
+# Currently just intersects and generates R-compatible table with gene names, counts sites
+# TODO: Add the R code to make plots/summaries of gene species, etc; +/- change output file name?
 rule gff_intersect:
     input: RESULT + "{sample}.align." + ALIGN_MODE + ".strand.pos.CPMs.bg",
            RESULT + "{sample}.align." + ALIGN_MODE + ".strand.neg.CPMs.bg"
     params: FULLGFF
-    output: RESULT + "{sample}.align." + ALIGN_MODE + ".gffintersect.tab"
+    output: RGRAPHS + "{sample}.align." + ALIGN_MODE + ".gffintersect.tab"
     shell: "bash gff_intersect.sh {input} {params} {output}"
+
+# Currently just intersects and generates R-compatible for gene binning
+# TODO: Revist R code for gene body plot
+# TODO: Make dynamic arguments for mrna/utr windows and count threshold
+rule gene_bins:
+    input: RESULT + "{sample}.align." + ALIGN_MODE + ".strand.pos.CPMs.bg",
+           RESULT + "{sample}.align." + ALIGN_MODE + ".strand.neg.CPMs.bg"
+    params: MRNAWINDOWS, UTRWINDOWS
+    output: RGRAPHS + "{sample}.align." + ALIGN_MODE + ".windows.tab"
+    shell: "bash gene_binning.sh {input} {params} {output}"
