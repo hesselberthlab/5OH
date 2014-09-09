@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 
-#BSUB -J rm_dup_umi
-#BSUB -e rm_dup_umi.%J.%I.err
-#BSUB -o rm_dup_umi.%J.%I.out
-#BSUB -q normal
-#BSUB -n 6
-
 <<DOC
 Remove duplicate UMIs
+
 Input: RESULT + "{sample}.UMIs_not_removed.align." + ALIGN_MODE + ".bam"
 Params: RESULT + "{sample}.umi-report.align." + ALIGN_MODE + ".bed.gz"
 Output: RESULT + "{sample}.align." + ALIGN_MODE + ".bam"

@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 
-#BSUB -J trim
-#BSUB -e align.%J.%I.err
-#BSUB -o align.%J.%I.out
-#BSUB -q normal
-#BSUB -n 6
-
 <<DOC
 Trim the UMI from the FASTQ.
+
 Input: DATA + {sample}.fq.gz
 Params: UMI
 Output: DATA + {sample}.umi.fq.gz
@@ -20,6 +15,7 @@ unprocessed_fastq=$1
 UMI=$2
 fastq=$3
 
+# Trim UMI from fastq using umitoools trim
 umitools trim $unprocessed_fastq $UMI \
     | gzip -c \
     > $fastq
