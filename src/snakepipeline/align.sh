@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
 
-#BSUB -J align
-#BSUB -e align.%J.%I.err
-#BSUB -o align.%J.%I.out
-#BSUB -q normal
-#BSUB -n 6
-
 <<DOC
 Align the reads!
+
 Input: DATA + {sample}.umi.fq.gz
 Params: BOWTIEIDX, ALIGN_ARGS
 Output: DATA + {sample}.UMIs_not_removed.align.{align_mode}.bam
 DOC
 
 set -o nounset -o pipefail -o errexit -x
-
 
 # Read variables from command line
 if [[ $# == 3 ]]; then        # When alignment arguments are empty, only three variables are passed to script
