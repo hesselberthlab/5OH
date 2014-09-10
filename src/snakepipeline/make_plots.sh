@@ -37,10 +37,12 @@ done
 ###############################
 # mRNA GENE BINNING
 #
-# Make compatible with Jaycode
-#
-# [Rscript ...]
-#
+# minimum number of counts
+mincounts=(5 10 25 50 100)
+
+for count in "${mincounts[@]}"; do
+    Rscript "${RSCRIPTS}/window_analysis_utrs_and_exons.R" $windowstab $sample $count $RGRAPHS
+done
 ###############################
 
 ###############################

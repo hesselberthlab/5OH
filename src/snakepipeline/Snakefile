@@ -40,12 +40,13 @@ UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source       # 
 
 # The input to the first rule should be the desired output of the full workflow
 rule all:
+#    input: expand("{web}{proj}/{sample}.align.{align_mode}.tracks.txt", web=WEBFOLDER, proj=PROJECTDIR, sample=SAMPLES, align_mode=ALIGN_MODE)
     input: expand("{rgraphs}{sample}.align.{align_mode}.placeholder.txt", rgraphs=RGRAPHS, sample=SAMPLES, align_mode=ALIGN_MODE)
 
 # The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
     input: DATA + "{sample}.fq.gz"
-    params: UMI
+    params: UMI, RESULT
     output: DATA + "{sample}.umi.fq.gz"
     shell: "bash trim_umi.sh {input} {params} {output}"
 
