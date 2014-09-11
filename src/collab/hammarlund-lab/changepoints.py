@@ -7,6 +7,7 @@ import pdb
 import rpy2.robjects as robjects
 import operator
 
+from segtools import ProgressBar
 from pybedtools import BedTool
 from rpy2.robjects.packages import importr
 
@@ -26,13 +27,17 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 
     changepoint_scores = {}
 
+    if verbose:
+        num_genes = len([region for region in genes])
+        progress = ProgressBar(num_genes,
+                              label=">> calculating cpts: ")
+
     for region in genes:      # loop through each gene
 
         gene_name = region.fields[3]
         region_bedtool = BedTool([region.fields[:3]])
 
-        if verbose:
-            print >>sys.stderr, ">> cpt calc: %s" % region.name
+        if verbose: progress.next()
 
         # XXX strandedness argument?
         signal_data = signal.intersect(region_bedtool, sorted=True)
@@ -61,6 +66,8 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
         changepoint_scores[gene_name] = score
 
     return top_scores(changepoint_scores, 10)
+
+    if verbose: progress.end()
 
 def calc_changepoint(count_vector):
     """Return first changepoint given an IntVector of counts."""
