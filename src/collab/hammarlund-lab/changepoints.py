@@ -35,6 +35,8 @@ def changepoints(gene_bed, signal_bedgraph):
 
         region_cpt = calc_changepoint(count_vector)
 
+        pdb.set_trace()
+
         # Todo: Store as tuple with region entry.
 
 def calc_changepoint(count_vector):
@@ -43,7 +45,7 @@ def calc_changepoint(count_vector):
     # Can change for multiple (or maybe last?) changepoint
 
     cpointdata = changepoint.cpt_meanvar(count_vector)
-    cpoint = int(changepoint.cpts(cpoint)[0])  # parse changepoint values
+    cpoint = int(changepoint.cpts(cpointdata)[0])  # parse changepoint values
 
     return cpoint
 
