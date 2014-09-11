@@ -19,7 +19,7 @@ except ImportError:
     print >>sys.stderr, "install R changepoint package"
     sys.exit(1)
 
-def changepoints(gene_bed, signal_bedgraph):
+def changepoints(gene_bed, signal_bedgraph, verbose):
 
     genes = BedTool(gene_bed)
     signal = BedTool(signal_bedgraph)
@@ -27,9 +27,15 @@ def changepoints(gene_bed, signal_bedgraph):
     changepoint_scores = {}
 
     for region in genes:      # loop through each gene
+
         gene_name = region.fields[3]
         region_bedtool = BedTool([region.fields[:3]])
-        signal_data = signal.intersect(region_bedtool) # strandedness argument?
+
+        if verbose:
+            print >>sys.stderr, ">> cpt calc: %s" % region.name
+
+        # XXX strandedness argument?
+        signal_data = signal.intersect(region_bedtool, sorted=True)
 
         # Create list from count intersection
         count_list = [int(datum.fields[3]) for datum in signal_data]
@@ -90,10 +96,12 @@ def main():
 
     parser.add_argument('gene_bed', help='BED file of genes')
     parser.add_argument('signal_bedgraph', help='bedgraph signal')
+    parser.add_argument('--verbose', action='store_true',
+                        help='be verbose [default: %default]')
 
     args = parser.parse_args()
 
-    return changepoints(args.gene_bed, args.signal_bedgraph)
+    return changepoints(args.gene_bed, args.signal_bedgraph, args.verbose)
 
 if __name__ == '__main__':
     sys.exit(main())
