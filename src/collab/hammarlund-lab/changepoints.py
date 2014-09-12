@@ -64,10 +64,11 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
         # Store in dict keyed by gene name
         # Consider other options, ie full region entry?
         changepoint_scores[gene_name] = score
+        
+    if verbose: progress.end()
 
     return top_scores(changepoint_scores, 10)
 
-    if verbose: progress.end()
 
 def calc_changepoint(count_vector):
     """Return first changepoint given an IntVector of counts."""
