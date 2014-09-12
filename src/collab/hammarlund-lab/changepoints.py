@@ -25,10 +25,11 @@ except ImportError:
 # minimum number of signals for changepoint calculation
 CPT_MINSIGNALS = 4
 
-def changepoints(gene_bed, signal_bedgraph, verbose):
+def changepoints(gene_bed, pos_signal_bedgraph, neg_signal_bedgraph, verbose):
 
     genes_bedtool = BedTool(gene_bed)
-    signal_bedtool = BedTool(signal_bedgraph)
+    pos_signal_bedtool = BedTool(pos_signal_bedgraph)
+    neg_signal_bedtool = BedTool(neg_signal_bedgraph)
 
     if verbose:
         # make a progress bar
@@ -39,7 +40,8 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 
         if verbose: progress.next()
 
-        intersect_data = signal_from_interval(interval, signal_bedtool, verbose)
+        intersect_data = signal_from_interval(interval, pos_signal_bedtool,
+                                              neg_signal_bedtool, verbose)
         if not intersect_data: continue
 
         # get counts from the intersect data and convert to IntVector
@@ -86,11 +88,17 @@ def calc_interval_score(signal, interval_cpt, strand, verbose):
 
     return score
 
-def signal_from_interval(interval, signal_bedtool, verbose):
+def signal_from_interval(interval, pos_signal_bedtool, neg_signal_bedtool, verbose):
     ''' intersects signal from a given interval. converts signals to
     IntVector for changepoint calculation'''
 
+    if interval.strand == '+':
+        signal_bedtool = pos_signal_bedtool
+    elif interval.strand == '-':
+        signal_bedtool = neg_signal_bedtool
+
     interval_bedtool = BedTool([interval.fields[:3]])
+
     intersect = signal_bedtool.intersect(interval_bedtool, sorted=True)
 
     intersect_data = [i.fields for i in intersect]
@@ -127,13 +135,15 @@ def main():
                             formatter_class=ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('gene_bed', help='BED file of genes')
-    parser.add_argument('signal_bedgraph', help='bedgraph signal')
+    parser.add_argument('-p', '--pos-signal-bedgraph', help='pos bedgraph signal')
+    parser.add_argument('-n', '--neg-signal-bedgraph', help='neg bedgraph signal')
     parser.add_argument('--verbose', action='store_true',
                         help='be verbose',default=False)
 
     args = parser.parse_args()
 
-    return changepoints(args.gene_bed, args.signal_bedgraph, args.verbose)
+    return changepoints(args.gene_bed, args.pos_signal_bedgraph,
+                        args.neg_signal_bedgraph, args.verbose)
 
 if __name__ == '__main__':
     sys.exit(main())
