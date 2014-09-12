@@ -3,22 +3,23 @@
 ''' changpoints: calc changepoints '''
 
 import sys
-import pdb
-import rpy2.robjects as robjects
+import ipdb
 import operator
-import pybedtools
 
+from numpy import mean, median
 from segtools import ProgressBar
-from pybedtools import BedTool
+from pybedtools import BedTool, cleanup
+
+from rpy2 import robjects 
 from rpy2.robjects.packages import importr
 
 __version__ = '0.1'
 
-# Import Changepoint package from R
+# Import changepoint package from R
 try:
     changepoint = importr('changepoint')
 except ImportError:
-    print >>sys.stderr, "install R changepoint package"
+    print >>sys.stderr, ">> need R: install.packages('changepoint')"
     sys.exit(1)
 
 def changepoints(gene_bed, signal_bedgraph, verbose):
@@ -26,86 +27,98 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
     genes = BedTool(gene_bed)
     signal = BedTool(signal_bedgraph)
 
-    changepoint_scores = {}
-
     if verbose:
-        num_genes = len([region for region in genes])
-        progress = ProgressBar(num_genes,
-                              label=">> calculating cpts: ")
+        # make a progress bar
+        num_genes = len(list(genes))
+        progress = ProgressBar(num_genes, label=">> calculating cpts: ")
 
-    for region in genes:      # loop through each gene
-        gene_name = region.fields[3]
-        region_bedtool = BedTool([region.fields[:3]])
+    for interval in genes:      
 
         if verbose: progress.next()
 
-        # XXX strandedness argument?
-        signal_data = signal.intersect(region_bedtool, sorted=True)
+        signal = signal_from_interval(interval, signal_bedtool, verbose)
 
-        # Create list from count intersection
-        count_list = [int(datum.fields[3]) for datum in signal_data]
-        if len(count_list) < 4:               # need 4 values to calc changepoint
-            pybedtools.cleanup(remove_all=True)
-            continue
+        if not signal: continue
 
-        # Convert to Int Vector
-        count_vector = robjects.IntVector(count_list)
+        interval_cpt = calc_changepoint(signal)
 
-        region_cpt = calc_changepoint(count_vector)
+        # XXX change calc_changepoint() method to return None if no
+        # changepoints, should be no numerical logic here i.e.:
+        # if not interval_cpt: continue
+        #
+        if interval_cpt < 2: continue
 
-        if region_cpt < 2:  # if no changepoint found
-            pybedtools.cleanup(remove_all=True)
-            continue
+        score = calc_interval_score(signal, interval_cpt, interval.strand, verbose)
 
-        # avg signal counts to right of changepoint
-        rcpt_avg = sum(count_vector[region_cpt:])/float(len(count_vector[region_cpt:]))
+        # the cpt is an index in the coord list, look up the orginal
+        # coords for the report
+        chrom, start, stop = signal[interval_cpt].fields[:3]
 
-        # avg signal counts to left of changepoint
-        lcpt_avg = sum(count_vector[:region_cpt])/float(len(count_vector[:region_cpt]))
+        # report BED6 format
+        fields = (chrom, start, stop, interval.name, score, interval.strand)
+        print '\t'.join(map(str, fields))
 
-        # score is the ratio of avg. signal to right and left of changepoint
-        score = rcpt_avg/lcpt_avg
-
-        # Store in dict keyed by gene name
-        # Consider other options, ie full region entry?
-        # changepoint_scores[gene_name] = score
-
-        region_cpt_coords = signal_data[region_cpt].fields[:3]
-
-        bed_line = "\t".join(region_cpt_coords) + "\t".join([gene_name, str(score), region.fields[5]])
-
-        print bed_line
-
-        pybedtools.cleanup(remove_all=True)
-        
     if verbose: progress.end()
 
-    #return top_scores(changepoint_scores, 10)
-    return
+def calc_interval_score(signal, interval_cpt, strand, verbose):
+    ''' calculates score for the interval based on a changepoint. score is
+    the mean signal 3' of the cpt divided by the mean score 5' of the
+    changepoint.'''
 
-def calc_changepoint(count_vector):
+    # XXX: use numpy.mean
+    left_cpt_signal = signal[interval_cpt:]
+    right_cpt_signal = signal[:interval_cpt]
+
+    ipdb.set_trace()
+
+    # score takes strand into account, i.e. score = upstream / downstream
+    if strand == '+':
+        score = right_cpt_mean / left_cpt_mean
+    elif strand == '-':
+        score = left_cpt_mean / right_cpt_mean
+
+    return score
+
+def signal_from_interval(interval, signal_bedtool, verbose):
+    ''' doc '''
+
+    interval_bedtool = BedTool([interval.fields[:3]])
+    # XXX strandedness argument?
+    #
+    # there is no strand in bedgraph data, ideally pass in both pos
+    # and neg data and determine which one you need from the BED
+    # strand field
+    intersect = signal_bedtool.intersect(interval_bedtool, sorted=True)
+
+    # Create list from count intersection
+    counts = [int(datum.fields[3]) for datum in intersect]
+
+    # need 4 values to calc cpt
+    if len(counts) < 4: return None
+
+    # Convert to Int Vector
+    counts = robjects.IntVector(counts)
+
+    # explicity cleanup files with pybedtools.cleanup()
+    cleanup(remove_all=True)
+
+    return counts
+
+def calc_changepoint(signal):
     """Return first changepoint given an IntVector of counts."""
     # Note: Currently only considers single (first) changepoint
     # Can change for multiple (or maybe last?) changepoint
 
-    cpointdata = changepoint.cpt_meanvar(count_vector)
-    cpoints_array = changepoint.cpts(cpointdata)
+    cpt_data = changepoint.cpt_meanvar(signal)
+    # XXX: cpoints is a list?
+    cpoints = changepoint.cpts(cpt_data)
 
-    if len(cpoints_array) != 0:
-        cpoint = int(changepoint.cpts(cpointdata)[0])  # parse changepoint values
+    if len(cpoints) != 0:
+        cpoint = int(changepoint.cpts(cpt_data)[0])  # parse changepoint values
     else:
         cpoint = 0    # ie, no changepoint found
 
     return cpoint
-
-def top_scores(score_dict, n):
-    """Return top n score entries from score dictionary"""
-
-    score_list = sorted(score_dict.iteritems(), key=operator.itemgetter(1))
-    score_list.reverse()
-    top_score_list = score_list[:n]
-
-    return top_score_list
 
 def main():
 
@@ -121,8 +134,6 @@ def main():
                         help='be verbose [default: %default]')
 
     args = parser.parse_args()
-
-    pybedtools.set_tempdir('/vol2/home/speach/tmp')
 
     return changepoints(args.gene_bed, args.signal_bedgraph, args.verbose)
 
