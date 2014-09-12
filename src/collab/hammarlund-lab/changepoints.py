@@ -6,6 +6,7 @@ import sys
 import pdb
 import rpy2.robjects as robjects
 import operator
+import pybedtools
 
 from segtools import ProgressBar
 from pybedtools import BedTool
@@ -33,7 +34,6 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
                               label=">> calculating cpts: ")
 
     for region in genes:      # loop through each gene
-
         gene_name = region.fields[3]
         region_bedtool = BedTool([region.fields[:3]])
 
@@ -44,13 +44,18 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 
         # Create list from count intersection
         count_list = [int(datum.fields[3]) for datum in signal_data]
-        if len(count_list) < 4: continue      # need 4 values to calc changepoint
+        if len(count_list) < 4:               # need 4 values to calc changepoint
+            pybedtools.cleanup(remove_all=True)
+            continue
 
         # Convert to Int Vector
         count_vector = robjects.IntVector(count_list)
 
         region_cpt = calc_changepoint(count_vector)
-        if region_cpt < 2: continue   # if no changepoint found
+
+        if region_cpt < 2:  # if no changepoint found
+            pybedtools.cleanup(remove_all=True)
+            continue
 
         # avg signal counts to right of changepoint
         rcpt_avg = sum(count_vector[region_cpt:])/float(len(count_vector[region_cpt:]))
@@ -63,12 +68,20 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 
         # Store in dict keyed by gene name
         # Consider other options, ie full region entry?
-        changepoint_scores[gene_name] = score
+        # changepoint_scores[gene_name] = score
+
+        region_cpt_coords = signal_data[region_cpt].fields[:3]
+
+        bed_line = "\t".join(region_cpt_coords) + "\t".join([gene_name, str(score), region.fields[5]])
+
+        print bed_line
+
+        pybedtools.cleanup(remove_all=True)
         
     if verbose: progress.end()
 
-    return top_scores(changepoint_scores, 10)
-
+    #return top_scores(changepoint_scores, 10)
+    return
 
 def calc_changepoint(count_vector):
     """Return first changepoint given an IntVector of counts."""
@@ -108,6 +121,8 @@ def main():
                         help='be verbose [default: %default]')
 
     args = parser.parse_args()
+
+    pybedtools.set_tempdir('/vol2/home/speach/tmp')
 
     return changepoints(args.gene_bed, args.signal_bedgraph, args.verbose)
 
