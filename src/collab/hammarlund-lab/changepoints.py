@@ -22,6 +22,9 @@ except ImportError:
     print >>sys.stderr, ">> need R: install.packages('changepoint')"
     sys.exit(1)
 
+# minimum number of signals for changepoint calculation
+CPT_MINSIGNALS = 4
+
 def changepoints(gene_bed, signal_bedgraph, verbose):
 
     genes_bedtool = BedTool(gene_bed)
@@ -36,23 +39,29 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 
         if verbose: progress.next()
 
-        result = signal_from_interval(interval, signal_bedtool, verbose)
+        intersect_data = signal_from_interval(interval, signal_bedtool, verbose)
+        if not intersect_data: continue
 
-        if not result: continue
-        coords, signal = result
+        # get counts from the intersect data and convert to IntVector
+        counts = ([int(score) for chrom, start, end, score in intersect_data])
+        signals = robjects.IntVector(counts)
 
-        interval_cpt = calc_changepoint(signal)
+        interval_cpt = calc_changepoint(signals)
 
         if not interval_cpt: continue
 
-        score = calc_interval_score(signal, interval_cpt, interval.strand, verbose)
+        interval_score = calc_interval_score(counts, interval_cpt,
+                                    interval.strand, verbose)
 
         # the cpt is an index in the coord list, look up the orginal
         # coords for the report
+        coords = [(chrom, start, end) for chrom, start, end, score
+                  in intersect_data]
+
         chrom, start, stop = coords[interval_cpt]
 
         # report BED6 format
-        fields = (chrom, start, stop, interval.name, score, interval.strand)
+        fields = (chrom, start, stop, interval.name, interval_score, interval.strand)
         print '\t'.join(map(str, fields))
 
     if verbose: progress.end()
@@ -60,10 +69,14 @@ def changepoints(gene_bed, signal_bedgraph, verbose):
 def calc_interval_score(signal, interval_cpt, strand, verbose):
     ''' calculates score for the interval based on a changepoint. score is
     the mean signal 3' of the cpt divided by the mean score 5' of the
-    changepoint.'''
+    changepoint.
+    
+    Returns:
+        score (float)
+        '''
 
-    left_cpt_signal = mean(signal[interval_cpt:])
-    right_cpt_signal = mean(signal[:interval_cpt])
+    left_cpt_signal = mean(signal[:interval_cpt])
+    right_cpt_signal = mean(signal[interval_cpt:])
 
     # score takes strand into account, i.e. score = downstream / upstream 
     if strand == '+':
@@ -74,34 +87,27 @@ def calc_interval_score(signal, interval_cpt, strand, verbose):
     return score
 
 def signal_from_interval(interval, signal_bedtool, verbose):
-    ''' doc '''
+    ''' intersects signal from a given interval. converts signals to
+    IntVector for changepoint calculation'''
 
     interval_bedtool = BedTool([interval.fields[:3]])
     intersect = signal_bedtool.intersect(interval_bedtool, sorted=True)
 
-    # Create list from count intersection
-    counts = [int(datum.fields[3]) for datum in intersect]
+    intersect_data = [i.fields for i in intersect]
 
-    # need 4 values to calc cpt
-    if len(counts) < 4: return None
-
-    # Convert to Int Vector
-    counts = robjects.IntVector(counts)
-
-    # maintain list of coords for later
-    coords = [(i.chrom, i.start, i.end) for i in intersect]
+    if len(intersect_data) < CPT_MINSIGNALS: return None
 
     # explicity cleanup files with pybedtools.cleanup()
     cleanup(remove_all=True)
 
-    return (coords, counts)
+    return intersect_data
 
-def calc_changepoint(signal):
+def calc_changepoint(signals):
     """Return first changepoint given an IntVector of counts."""
     # Note: Currently only considers single (first) changepoint
     # Can change for multiple (or maybe last?) changepoint
 
-    cpt_data = changepoint.cpt_meanvar(signal)
+    cpt_data = changepoint.cpt_meanvar(signals)
     cpoints = changepoint.cpts(cpt_data)
 
     if not cpoints: return None
