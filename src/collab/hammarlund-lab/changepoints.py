@@ -24,35 +24,32 @@ except ImportError:
 
 def changepoints(gene_bed, signal_bedgraph, verbose):
 
-    genes = BedTool(gene_bed)
-    signal = BedTool(signal_bedgraph)
+    genes_bedtool = BedTool(gene_bed)
+    signal_bedtool = BedTool(signal_bedgraph)
 
     if verbose:
         # make a progress bar
-        num_genes = len(list(genes))
+        num_genes = len(list(genes_bedtool))
         progress = ProgressBar(num_genes, label=">> calculating cpts: ")
 
-    for interval in genes:      
+    for interval in genes_bedtool:      
 
         if verbose: progress.next()
 
-        signal = signal_from_interval(interval, signal_bedtool, verbose)
+        result = signal_from_interval(interval, signal_bedtool, verbose)
 
-        if not signal: continue
+        if not result: continue
+        coords, signal = result
 
         interval_cpt = calc_changepoint(signal)
 
-        # XXX change calc_changepoint() method to return None if no
-        # changepoints, should be no numerical logic here i.e.:
-        # if not interval_cpt: continue
-        #
-        if interval_cpt < 2: continue
+        if not interval_cpt: continue
 
         score = calc_interval_score(signal, interval_cpt, interval.strand, verbose)
 
         # the cpt is an index in the coord list, look up the orginal
         # coords for the report
-        chrom, start, stop = signal[interval_cpt].fields[:3]
+        chrom, start, stop = coords[interval_cpt]
 
         # report BED6 format
         fields = (chrom, start, stop, interval.name, score, interval.strand)
@@ -65,17 +62,14 @@ def calc_interval_score(signal, interval_cpt, strand, verbose):
     the mean signal 3' of the cpt divided by the mean score 5' of the
     changepoint.'''
 
-    # XXX: use numpy.mean
-    left_cpt_signal = signal[interval_cpt:]
-    right_cpt_signal = signal[:interval_cpt]
+    left_cpt_signal = mean(signal[interval_cpt:])
+    right_cpt_signal = mean(signal[:interval_cpt])
 
-    ipdb.set_trace()
-
-    # score takes strand into account, i.e. score = upstream / downstream
+    # score takes strand into account, i.e. score = downstream / upstream 
     if strand == '+':
-        score = right_cpt_mean / left_cpt_mean
+        score = right_cpt_signal / left_cpt_signal
     elif strand == '-':
-        score = left_cpt_mean / right_cpt_mean
+        score = left_cpt_signal / right_cpt_signal
 
     return score
 
@@ -83,11 +77,6 @@ def signal_from_interval(interval, signal_bedtool, verbose):
     ''' doc '''
 
     interval_bedtool = BedTool([interval.fields[:3]])
-    # XXX strandedness argument?
-    #
-    # there is no strand in bedgraph data, ideally pass in both pos
-    # and neg data and determine which one you need from the BED
-    # strand field
     intersect = signal_bedtool.intersect(interval_bedtool, sorted=True)
 
     # Create list from count intersection
@@ -99,10 +88,13 @@ def signal_from_interval(interval, signal_bedtool, verbose):
     # Convert to Int Vector
     counts = robjects.IntVector(counts)
 
+    # maintain list of coords for later
+    coords = [(i.chrom, i.start, i.end) for i in intersect]
+
     # explicity cleanup files with pybedtools.cleanup()
     cleanup(remove_all=True)
 
-    return counts
+    return (coords, counts)
 
 def calc_changepoint(signal):
     """Return first changepoint given an IntVector of counts."""
@@ -110,28 +102,28 @@ def calc_changepoint(signal):
     # Can change for multiple (or maybe last?) changepoint
 
     cpt_data = changepoint.cpt_meanvar(signal)
-    # XXX: cpoints is a list?
     cpoints = changepoint.cpts(cpt_data)
 
-    if len(cpoints) != 0:
-        cpoint = int(changepoint.cpts(cpt_data)[0])  # parse changepoint values
-    else:
-        cpoint = 0    # ie, no changepoint found
+    if not cpoints: return None
+
+    # first cpt in the list is the calculated changepoint. the last value
+    # is the end of the signal
+    cpoint = int(cpoints[0])
 
     return cpoint
 
 def main():
 
-    from argparse import ArgumentParser, RawDescriptionHelpFormatter
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
     parser = ArgumentParser(description=__doc__,
                             version=__version__,
-                            formatter_class=RawDescriptionHelpFormatter)
+                            formatter_class=ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('gene_bed', help='BED file of genes')
     parser.add_argument('signal_bedgraph', help='bedgraph signal')
     parser.add_argument('--verbose', action='store_true',
-                        help='be verbose [default: %default]')
+                        help='be verbose',default=False)
 
     args = parser.parse_args()
 
