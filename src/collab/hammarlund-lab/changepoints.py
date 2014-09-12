@@ -28,6 +28,7 @@ CPT_MINSIGNALS = 4
 def changepoints(gene_bed, pos_signal_bedgraph, neg_signal_bedgraph, verbose):
 
     genes_bedtool = BedTool(gene_bed)
+
     pos_signal_bedtool = BedTool(pos_signal_bedgraph)
     neg_signal_bedtool = BedTool(neg_signal_bedgraph)
 
@@ -88,9 +89,14 @@ def calc_interval_score(signal, interval_cpt, strand, verbose):
 
     return score
 
-def signal_from_interval(interval, pos_signal_bedtool, neg_signal_bedtool, verbose):
+def signal_from_interval(interval, pos_signal_bedtool,
+                         neg_signal_bedtool, verbose):
     ''' intersects signal from a given interval. converts signals to
-    IntVector for changepoint calculation'''
+    IntVector for changepoint calculation
+    
+    Returns:
+        intersect_data (list of tuples) or None
+        '''
 
     if interval.strand == '+':
         signal_bedtool = pos_signal_bedtool
@@ -111,7 +117,11 @@ def signal_from_interval(interval, pos_signal_bedtool, neg_signal_bedtool, verbo
     return intersect_data
 
 def calc_changepoint(signals):
-    """Return first changepoint given an IntVector of counts."""
+    '''Return first changepoint given an IntVector of counts.
+    
+    Returns:
+        cpoint (int)
+        '''
     # Note: Currently only considers single (first) changepoint
     # Can change for multiple (or maybe last?) changepoint
 
