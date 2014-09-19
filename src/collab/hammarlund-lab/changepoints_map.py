@@ -44,8 +44,6 @@ def parse_file(strand_signal_file):
         count_list = [int(x) for x in fields[6].split(",")]
         
         # Process gene if there are at least CPT_MINSIGNALS above COUNT_CUTOFF
-        # TODO: put in minimum count cutoff or something?
-        
         cl_array = asarray(count_list) # count_list as numpy array
         cl_above_cutoff = cl_array[cl_array >= COUNT_CUTOFF]
         
