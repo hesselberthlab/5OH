@@ -1,0 +1,101 @@
+# Snakemake-based pipeline for 5OH-Seq in yeast - Paper version
+#
+# Usage:
+# - Set experiment-specific variables
+# - Run "snakemake -c bsub -j"
+# - Enjoy life.
+
+# Experiment-specific variables
+user = "/vol2/home/speach"                            # path to your home directory
+DATA = "%s/projects/5OH/data/methodspaper/" % user       # location of raw data
+PROJECTDIR = "projects/5OH/results/methodspaper"         # directory for results
+RESULT = "%s/%s/" % (user, PROJECTDIR)                # full directory path for results
+RGRAPHS = "%srgraphs/" % RESULT                       # full directory path for R graph results
+
+SAMPLES = "SP5 SP6 SP7 SP8 SP9 SP10 SP11 SP12 SP13 SP14 SP15 SP16 SP17 SP18 SP19 SP20 SP27 SP28 SP29".split() # sample names
+ASSEMBLY = "sacCer1"                                  # assembly for alignment (will be included in filename)
+UMI = "NNNNNNNN"                                      # UMI to be removed
+ALIGN_MODE = "all"                                   # name of alignment mode (will be included in filename)
+ALIGN_ARGS = "-a"                                # alignment arguments passed to bowtie
+COVARGS = "-5 -bg -g"                                # genome coverage arguments passed to bedtools genomecov
+
+
+# Consistent variables
+source = "/vol2/home/speach"                                                    # location of source scrimpts
+PIPELINE = "%s/devel/5OH/src/snakepipeline" % source                            # path to snakepipeline
+ASSEM_TEXT = "assembly-%s." % ASSEMBLY                                          # text for assembly alignment
+ALIGN_TEXT = "align-%s" % ALIGN_MODE                                            # text for alignment mode
+ASAL_TEXT = "%s%s" % (ASSEM_TEXT, ALIGN_TEXT)                                   # assembly and alignment text
+BOWTIEIDX = "%s/ref/genomes/%s/%s" % (source, ASSEMBLY, ASSEMBLY)               # bowtie index
+CHROM_SIZES = "%s/ref/genomes/%s/%s.chrom.sizes" % (source, ASSEMBLY, ASSEMBLY) # chromosome sizes
+STRANDS = "both pos neg".split()                                                # Strands
+SANDBOX = "http://amc-sandbox.ucdenver.edu/~%s/" % user                         # path to webspace on www
+WEBFOLDER = "%s/public_html/" % user                                            # path to web folder on cluster
+RSCRIPTS = "%s/devel/5OH/src/R/" % source                                       # R scripts directory
+
+# Consistent variables (currently specific to yeast)
+GTF = "%s/ref/genomes/%s/sgdGene.%s.gtf" % (source, ASSEMBLY, ASSEMBLY)       # GTF file from database
+FASTA = "%s/ref/genomes/%s/%s.fa" % (source, ASSEMBLY, ASSEMBLY)              # Fasta of specific assembly
+FULLGFF = "%s/ref/genomes/sacCer1/sacCer1.fuller.bed" % source                # GFF file containing "all" gene species
+MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.mrna.20windows.bed" % source    # mRNA split into 20 bins
+UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source       # UTRs split into 2 bins
+
+# The input to the first rule should be the desired output of the full workflow
+rule all:
+#    input: expand("{web}{proj}/{sample}.align.{align_mode}.tracks.txt", web=WEBFOLDER, proj=PROJECTDIR, sample=SAMPLES, align_mode=ALIGN_MODE)
+#    input: expand("{rgraphs}{sample}.align.{align_mode}.placeholder.txt", rgraphs=RGRAPHS, sample=SAMPLES, align_mode=ALIGN_MODE) 
+#    input: expand("{result}{sample}.{asal_text}alignstats.txt", result=RESULT, sample=SAMPLES, asal_text=ASAL_TEXT)
+#    input: expand("{result}{sample}.{asal_text}.strand.neg.CPMs.bg", result=RESULT, sample=SAMPLES, asal_text=ASAL_TEXT)
+     input: expand("{rgraphs}{sample}.{asal_text}.gffintersect.tab", rgraphs=RGRAPHS, sample=SAMPLES, asal_text=ASAL_TEXT)
+
+# The order of these rules does not matter, but are currently written in order of execution
+rule trim_umi:
+    input: DATA + "{sample}.fq.gz"
+    params: UMI
+    output: DATA + "{sample}.umi.fq.gz"
+    shell: "bash trim_umi.sh {input} {params} {output}"
+
+rule align:
+    input: DATA + "{sample}.umi.fq.gz"
+    params: BOWTIEIDX, ALIGN_ARGS
+    output: RESULT + "{sample}.UMIs_not_removed." + ASAL_TEXT + ".bam", RESULT + "{sample}." + ASAL_TEXT + ".alignstats.txt"   
+    shell: "bash align.sh {input} {output} {params}"
+
+rule remove_duplicate_umis:
+    input: RESULT + "{sample}.UMIs_not_removed." + ASAL_TEXT + ".bam"
+    params: RESULT + "{sample}.umi-report." + ASAL_TEXT + ".bed.gz"
+    output: RESULT + "{sample}." + ASAL_TEXT + ".bam"
+    shell: "bash rm_dup_umi.sh {input} {params} {output}"
+
+rule coverage_and_web:
+    input: RESULT + "{sample}." + ASAL_TEXT + ".bam"
+    params: CHROM_SIZES, RESULT, WEBFOLDER, PROJECTDIR, COVARGS
+    output: RESULT + "{sample}." + ASAL_TEXT + ".strand.pos.CPMs.bg",
+            RESULT + "{sample}." + ASAL_TEXT + ".strand.neg.CPMs.bg"
+    shell: "bash coverage.sh {input} {params}"
+
+rule gff_intersect:
+    input: RESULT + "{sample}." + ASAL_TEXT + ".strand.pos.CPMs.bg",
+           RESULT + "{sample}." + ASAL_TEXT + ".strand.neg.CPMs.bg"
+    params: FULLGFF
+    output: RGRAPHS + "{sample}." + ASAL_TEXT + ".gffintersect.tab"
+    shell: "bash gff_intersect.sh {input} {params} {output}"
+
+# TODO: Make dynamic arguments for mrna/utr windows and count threshold
+rule gene_bins:
+    input: RESULT + "{sample}." + ASAL_TEXT + ".strand.pos.CPMs.bg",
+           RESULT + "{sample}." + ASAL_TEXT + ".strand.neg.CPMs.bg"
+    params: MRNAWINDOWS, UTRWINDOWS
+    output: RGRAPHS + "{sample}." + ASAL_TEXT + ".windows.tab"
+    shell: "bash gene_binning.sh {input} {params} {output}"
+
+
+# TODO, R: - Make plots/summaries of gene species
+#          - gene body plot
+#          - make compatible with Jay's feature plot stuff
+rule make_plots:
+    input: RGRAPHS + "{sample}." + ASAL_TEXT + ".gffintersect.tab",
+           RGRAPHS + "{sample}." + ASAL_TEXT + ".windows.tab"
+    params: RSCRIPTS, RGRAPHS
+    output: RGRAPHS + "{sample}." + ASAL_TEXT + ".placeholder.txt" # output TBD...
+    shell: "bash make_plots.sh {input} {params} {output}"
