@@ -9,34 +9,73 @@
 
 library(ggplot2)
 library(dplyr)
+library(Cairo)
 
 datadir <- "~/projects/5OH/results/methodspaper"
 setwd(datadir)
 
+# parse data
 samplename <- "SP8.assembly-sacCer1.align-all"
-sampletable <- paste(samplename, ".FPKM_sum.tab", sep="")
-
-
+sampletable <- paste(samplename, ".FPKM_sum.std.tab", sep="")
 df <- read.table(sampletable, header=FALSE,
                  col.names = c("chrom", "start", "stop", "gene", "FPKM", "strand", "OH.signal"))
+filtereddf <- subset(df, FPKM > 0.1 & OH.signal >0) # remove genes without FPKM data
 
-highFPKMgenes <- subset(df, FPKM > 16000)
+# Interesting things to label
+highFPKMgenes <- subset(df, FPKM > 12000 & OH.signal > 10)
 highFPKMgenes %>% arrange(desc(FPKM))
 
-high5OHgenes <- subset(df, OH.signal > 3000 & FPKM < 20000)
+high5OHgenes <- subset(df, OH.signal > 1500 & FPKM < 20000)
 high5OHgenes %>% arrange(desc(OH.signal))
 
-p <- ggplot(subset(df, OH.signal != 0 & FPKM != 0), aes(x=OH.signal, y=FPKM)) +
+lowFPKMgenes <- subset(df, FPKM < 0.1)
+lowFPKMgenes %>% arrange(desc(FPKM))
+
+discretepeaklist <- levels(read.table("peaks/peaklist.txt", col.names = c("gene"))$gene)
+discretehits <- subset(df, gene %in% discretepeaklist)
+discrete_figures <- subset(df, gene %in% c("ADE8", "ADK1", "ADH1", "RPS31"))
+
+clusteredpeaklist <- levels(read.table("peaks/clusteredpeaklist.txt", col.names = c("gene"))$gene)
+clusteredhits <- subset(df, gene %in% clusteredpeaklist)
+clustered_figures <- subset(df, gene %in% c("FUN12", "CBF5"))
+
+
+full <- ggplot(filtereddf, aes(x=OH.signal, y=FPKM)) +
   geom_point() +
-  stat_smooth(method=lm, se=FALSE) +
-  geom_text(data=highFPKMgenes, mapping=aes(label=gene),
-            size=3.5,hjust=-0.1,vjust=0) +
-  geom_text(data=high5OHgenes, mapping=aes(label=gene),
-            size=3.5,hjust=0.5,vjust=-0.5) +
+  # Labelled Stuff
+  #stat_smooth(method=lm, se=FALSE) +
+  #geom_point(data=discretehits, color="blue", size=3) +
+  #geom_point(data=clusteredhits, color="red", size=3) +
+  #geom_text(data=highFPKMgenes, mapping=aes(label=gene), size=3.5,hjust=-0.1,vjust=0) +
+  #geom_text(data=high5OHgenes, mapping=aes(label=gene), size=3.5,hjust=0.5,vjust=-0.5) +
+  #geom_text(data=discrete_figures, mapping=aes(label=gene), color="blue",
+  #          size=5,hjust=0.5,vjust=-0.5) +
+  #geom_text(data=clustered_figures, mapping=aes(label=gene), color="red",
+  #          size=5,hjust=0.5,vjust=-0.5) +
   xlab("5OH-Seq signal (CPMs)") +
-  #scale_x_log10() +
-  #scale_y_log10() + 
+  scale_x_log10() +
+  scale_y_log10() +
   theme_bw()
+full
+
+zoom <- ggplot(subset(filtereddf, FPKM>0.1 & OH.signal>9), aes(x=OH.signal, y=FPKM)) +
+  geom_point() +
+  xlab("5OH-Seq signal (CPMs)") +
+  scale_x_log10() +
+  scale_y_log10() +
+  theme_bw()
+zoom
+
+
 
 df.lm = lm(FPKM ~ OH.signal, data=df)
 summary(df.lm)
+
+ggsave(plot = full,
+       filename = "SP8.assembly-sacCer1.align-all.FPKM_sum.std.pdf",
+       height = 5,
+       width = 5)
+
+ggsave(plot=zoom, filename="SP8.assembly-sacCer1.align-all.FPKM_sum.std.zoom.pdf",
+       height=7,
+       width=7)
