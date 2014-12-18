@@ -1,3 +1,11 @@
+track mRNAs
+shortLabel mRNAs
+longLabel mRNA models
+type bigBed 12
+visibility pack
+bigDataUrl sgdGene.mRNAs.bb
+color 31,120,180
+
 track AminoAcidMotifs
 compositeTrack on
 shortLabel AaMotifs 
@@ -37,3 +45,4 @@ visibility dense
     bigDataUrl aa_motifs/aa_etc.bb
     type bigBed 6
     color 153,153,153
+

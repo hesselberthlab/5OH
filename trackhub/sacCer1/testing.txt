@@ -1,0 +1,31 @@
+track RNAseq
+compositeTrack on
+shortLabel RNAseq
+longLabel RNA-seq from Regev
+type bigWig
+visibility dense
+
+    track pos
+    parent RNAseq
+    shortLabel positive
+    visibility dense
+    bigDataUrl rna-seq/regev.pos.bw
+    color 56,117,215
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits 0:1e-6
+    autoScale off
+
+
+    track neg
+    parent RNAseq
+    shortLabel negative
+    visibility dense
+    bigDataUrl rna-seq/regev.neg.bw
+    color 56,117,215
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits -1e-6:0
+    autoScale off
+
+
