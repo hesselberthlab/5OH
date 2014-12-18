@@ -1,0 +1,6 @@
+hub 5OH
+shortLabel 5OH-seq
+longLabel  5OH-seq and analysis
+genomesFile genomes.txt 
+email jay.hesselberth@gmail.com
+descriptionUrl description.html 
