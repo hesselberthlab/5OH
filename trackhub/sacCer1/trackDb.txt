@@ -4,7 +4,7 @@ longLabel mRNA models
 type bigBed 12
 visibility pack
 bigDataUrl sgdGene.mRNAs.bb
-colorByStrand 230,97,1 94,60,153
+colorByStrand 202,0,32 5,113,176
 
 track AminoAcidMotifs
 compositeTrack on
@@ -61,7 +61,7 @@ visibility full
     shortLabel pos strand
     visibility full
     bigDataUrl rna-seq/regev.pos.bw
-    color 230,97,1
+    color 202,0,32
     type bigWig
     maxHeightPixels 32:64:11
     viewLimits 0:1e-6
@@ -71,7 +71,7 @@ visibility full
     shortLabel neg stand
     visibility full
     bigDataUrl rna-seq/regev.neg.rescale.bw
-    color 94,60,153
+    color 5,113,176
     type bigWig
     maxHeightPixels 32:64:11
     viewLimits 0:1e-6
