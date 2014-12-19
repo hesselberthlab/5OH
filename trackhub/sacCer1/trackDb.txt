@@ -4,7 +4,7 @@ longLabel mRNA models
 type bigBed 12
 visibility pack
 bigDataUrl sgdGene.mRNAs.bb
-color 31,120,180
+colorByStrand 230,97,1 94,60,153
 
 track AminoAcidMotifs
 compositeTrack on
