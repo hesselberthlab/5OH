@@ -8,6 +8,6 @@ url="http://amc-sandbox.ucdenver.edu/~jhessel/hubs/5OH/hub.txt"
 
 cp -r * ~/public_html/hubs/5OH/
 
-hubCheck $url
+hubCheck -verbose=2 $url
 
 echo "hub is at $url"
