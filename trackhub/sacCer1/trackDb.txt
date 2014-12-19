@@ -37,7 +37,6 @@ visibility dense
     type bigBed 6
     color 152,78,163
 
-    type bigBed 6
     track other 
     parent AminoAcidMotifs on
     visibility dense
@@ -45,4 +44,35 @@ visibility dense
     bigDataUrl aa_motifs/aa_etc.bb
     type bigBed 6
     color 153,153,153
+
+track RNAseq
+container multiWig
+aggregate transparentOverlay
+showSubtrackColorOnUi on
+shortLabel RNA-seq
+longLabel strand-specific RNA-seq (Levin et al. (2010) Nat Methods)
+type bigWig 0 1e-6
+viewLimits 0:1e-6
+maxHeightPixels 32:64:11
+visibility full
+
+    track pos
+    parent RNAseq
+    shortLabel pos strand
+    visibility full
+    bigDataUrl rna-seq/regev.pos.bw
+    color 230,97,1
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits 0:1e-6
+
+    track neg
+    parent RNAseq
+    shortLabel neg stand
+    visibility full
+    bigDataUrl rna-seq/regev.neg.rescale.bw
+    color 94,60,153
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits 0:1e-6
 
