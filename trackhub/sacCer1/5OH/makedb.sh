@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+set -o nounset -o pipefail -o errexit -x
+
 mainstanza="
 track 5OH-seq\n
 compositeTrack on\n
@@ -34,9 +36,9 @@ replicates=(Rep1 Rep2)
 strands=(pos neg all)
 signals=(counts CPMs)
 
-for strain in ${strains[@]}; do
-  for treatment in ${treatments[@]}; do
-    for strand in ${strands[@]}; do
+for strand in ${strands[@]}; do
+  for strain in ${strains[@]}; do
+    for treatment in ${treatments[@]}; do
       for signal in ${signals[@]}; do
         for rep in ${replicates[@]}; do
 
