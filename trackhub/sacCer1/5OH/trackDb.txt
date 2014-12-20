@@ -1,18 +1,18 @@
 track 5OH-seq
- compositeTrack on
- shortLabel 5OH-seq
- longLabel 5OH-seq Coverage and Peaks tracks
- subGroup1 view Views COV=Coverage
- subGroup2 strain Strain WT=wild-type delXrn1=delXrn1
- subGroup3 treatment Treatment NONE=None Tm=Tunicamycin SAP=phosphatase DMSO=DMSO DMSO.SAP=DMSO+phosphatase Tm.SAP=Tunicamycin+phosphatase PreFrag=Pre-fragmentation
- subGroup4 strand Strand pos=pos neg=neg all=all
- subGroup5 replicate Replicate NONE=none REP1=Rep1 REP2=Rep2
- subGroup6 signal Signal CPMs=CPMs counts=raw-counts
- dimensions dimX=treatment dimY=strain dimA=strand dimB=replicate dimC=signal
- filterComposite dimA dimB dimC
- sortOrder view=-
- type bed 6 .
- 
+compositeTrack on
+shortLabel 5OH-seq
+longLabel 5OH-seq Coverage and Peaks tracks
+subGroup1 view Views COV=Coverage
+subGroup2 strain Strain WT=wild-type delXrn1=delXrn1
+subGroup3 treatment Treatment NONE=None Tm=Tunicamycin SAP=phosphatase DMSO=DMSO DMSO.SAP=DMSO+phosphatase Tm.SAP=Tunicamycin+phosphatase PreFrag=Pre-fragmentation
+subGroup4 strand Strand pos=pos neg=neg all=all
+subGroup5 replicate Replicate NONE=none Rep1=Rep1 Rep2=Rep2
+subGroup6 signal Signal CPMs=CPMs counts=raw-counts
+dimensions dimX=treatment dimY=strain dimA=strand dimB=replicate dimC=signal
+filterComposite dimA dimB dimC
+sortOrder view=+ strand=+
+type bed 6 .
+
  	track 5OH-Coverage
  	view COV
  	parent 5OH-seq
@@ -25,7 +25,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=PreFrag replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.PreFrag.Rep1.pos.counts
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -35,7 +35,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=PreFrag replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.PreFrag.Rep1.pos.CPMs
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -45,7 +45,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.Rep1.pos.counts
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -55,7 +55,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.Rep2.pos.counts
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -65,7 +65,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.Rep1.pos.CPMs
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -75,7 +75,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.Rep2.pos.CPMs
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -85,7 +85,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.pos.counts
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -95,7 +95,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.pos.counts
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -105,7 +105,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.pos.CPMs
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -115,7 +115,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.pos.CPMs
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -125,7 +125,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.Rep1.pos.counts
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -135,7 +135,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.Rep2.pos.counts
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -145,7 +145,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.Rep1.pos.CPMs
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -155,7 +155,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.Rep2.pos.CPMs
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -165,7 +165,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.pos.counts
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -175,7 +175,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.pos.counts
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -185,7 +185,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.pos.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -195,7 +195,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=pos treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.pos.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -205,7 +205,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.pos.counts
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -215,7 +215,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.pos.counts
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -225,7 +225,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.pos.CPMs
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -235,7 +235,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.pos.CPMs
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -245,7 +245,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.pos.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -255,7 +255,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.pos.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -265,7 +265,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.pos.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -275,7 +275,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.pos.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -285,7 +285,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.pos.counts
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -295,7 +295,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.pos.counts
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -305,7 +305,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.pos.CPMs
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -315,7 +315,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.pos.CPMs
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -325,7 +325,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.pos.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -335,7 +335,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.pos.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -345,7 +345,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.pos.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=pos replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -355,7 +355,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=pos treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.pos.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.pos.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=pos replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 202,0,32
@@ -365,7 +365,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=PreFrag replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.PreFrag.Rep1.neg.counts
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -375,7 +375,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=PreFrag replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.PreFrag.Rep1.neg.CPMs
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -385,7 +385,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.Rep1.neg.counts
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -395,7 +395,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.Rep2.neg.counts
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -405,7 +405,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.Rep1.neg.CPMs
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -415,7 +415,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.Rep2.neg.CPMs
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -425,7 +425,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.neg.counts
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -435,7 +435,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.neg.counts
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -445,7 +445,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.neg.CPMs
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -455,7 +455,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.neg.CPMs
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -465,7 +465,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.Rep1.neg.counts
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -475,7 +475,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.Rep2.neg.counts
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -485,7 +485,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.Rep1.neg.CPMs
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -495,7 +495,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.Rep2.neg.CPMs
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -505,7 +505,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.neg.counts
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -515,7 +515,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.neg.counts
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -525,7 +525,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.neg.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -535,7 +535,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=neg treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.neg.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -545,7 +545,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.neg.counts
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -555,7 +555,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.neg.counts
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -565,7 +565,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.neg.CPMs
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -575,7 +575,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.neg.CPMs
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -585,7 +585,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.neg.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -595,7 +595,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.neg.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -605,7 +605,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.neg.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -615,7 +615,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.neg.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -625,7 +625,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.neg.counts
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -635,7 +635,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.neg.counts
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -645,7 +645,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.neg.CPMs
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -655,7 +655,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.neg.CPMs
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -665,7 +665,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.neg.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -675,7 +675,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.neg.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -685,7 +685,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.neg.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=neg replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -695,7 +695,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=neg treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.neg.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.neg.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=neg replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -705,7 +705,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=PreFrag replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.PreFrag.Rep1.all.counts
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -715,7 +715,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=PreFrag replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.PreFrag.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.PreFrag.Rep1.all.CPMs
+ 		shortLabel WT.PreFrag.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=PreFrag strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -725,7 +725,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.Rep1.all.counts
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -735,7 +735,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.Rep2.all.counts
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -745,7 +745,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.Rep1.all.CPMs
+ 		shortLabel WT.Tm.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -755,7 +755,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.Rep2.all.CPMs
+ 		shortLabel WT.Tm.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -765,7 +765,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.all.counts
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -775,7 +775,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.all.counts
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -785,7 +785,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.SAP.Rep1.all.CPMs
+ 		shortLabel WT.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -795,7 +795,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.Tm.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.Tm.SAP.Rep2.all.CPMs
+ 		shortLabel WT.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=Tm.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -805,7 +805,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.Rep1.all.counts
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -815,7 +815,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.Rep2.all.counts
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -825,7 +825,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.Rep1.all.CPMs
+ 		shortLabel WT.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -835,7 +835,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.Rep2.all.CPMs
+ 		shortLabel WT.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -845,7 +845,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.all.counts
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -855,7 +855,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.all.counts
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -865,7 +865,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep1.all.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -875,7 +875,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=WT strand=all treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/WT.DMSO.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel WT.DMSO.SAP.Rep2.all.CPMs
+ 		shortLabel WT.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=WT treatment=DMSO.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -885,7 +885,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.all.counts
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -895,7 +895,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.all.counts
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -905,7 +905,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.Rep1.all.CPMs
+ 		shortLabel delXrn1.Tm.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -915,7 +915,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.Rep2.all.CPMs
+ 		shortLabel delXrn1.Tm.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -925,7 +925,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.all.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -935,7 +935,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.all.counts
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -945,7 +945,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep1.all.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -955,7 +955,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=Tm.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.Tm.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.Tm.SAP.Rep2.all.CPMs
+ 		shortLabel delXrn1.Tm.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=Tm.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -965,7 +965,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.all.counts
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -975,7 +975,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.all.counts
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -985,7 +985,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.Rep1.all.CPMs
+ 		shortLabel delXrn1.DMSO.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -995,7 +995,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.Rep2.all.CPMs
+ 		shortLabel delXrn1.DMSO.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -1005,7 +1005,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO.SAP replicate=Rep1 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.all.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -1015,7 +1015,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO.SAP replicate=Rep2 signal=counts
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.all.counts
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -1025,7 +1025,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO.SAP replicate=Rep1 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep1.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep1.all.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep1
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=all replicate=Rep1
  		maxHeightPixels 30:30:10
  		color 5,113,176
@@ -1035,7 +1035,7 @@ track 5OH-seq
  		parent 5OH-Coverage
  		subGroups view=COV strain=delXrn1 strand=all treatment=DMSO.SAP replicate=Rep2 signal=CPMs
  		bigDataUrl 5OH/delXrn1.DMSO.SAP.Rep2.align.std.strand.all.counts.bw
- 		shortLabel delXrn1.DMSO.SAP.Rep2.all.CPMs
+ 		shortLabel delXrn1.DMSO.SAP.Rep2
  		longLabel 5OH-seq coverage strain=delXrn1 treatment=DMSO.SAP strand=all replicate=Rep2
  		maxHeightPixels 30:30:10
  		color 5,113,176

@@ -1,0 +1,39 @@
+track AminoAcidMotifs
+compositeTrack on
+shortLabel AaMotifs 
+longLabel Amino Acid motifs 
+type bigBed 6
+visibility dense
+
+    track acidic 
+    parent AminoAcidMotifs on
+    shortLabel Acidic
+    visibility dense
+    bigDataUrl aa_motifs/aa_acidic.bb
+    type bigBed 6
+    color 226,28,26
+
+    track basic
+    parent AminoAcidMotifs on
+    visibility dense
+    shortLabel Basic
+    bigDataUrl aa_motifs/aa_basic.bb
+    type bigBed 6
+    color 55,126,184
+
+    track electrostatic
+    parent AminoAcidMotifs on
+    visibility dense
+    shortLabel Electrostatic
+    bigDataUrl aa_motifs/aa_charged.bb
+    type bigBed 6
+    color 152,78,163
+
+    track other 
+    parent AminoAcidMotifs on
+    visibility dense
+    shortLabel Other
+    bigDataUrl aa_motifs/aa_etc.bb
+    type bigBed 6
+    color 153,153,153
+

@@ -11,11 +11,11 @@ subGroup1 view Views COV=Coverage\n
 subGroup2 strain Strain WT=wild-type delXrn1=delXrn1\n
 subGroup3 treatment Treatment NONE=None Tm=Tunicamycin SAP=phosphatase DMSO=DMSO DMSO.SAP=DMSO+phosphatase Tm.SAP=Tunicamycin+phosphatase PreFrag=Pre-fragmentation\n
 subGroup4 strand Strand pos=pos neg=neg all=all\n
-subGroup5 replicate Replicate NONE=none REP1=Rep1 REP2=Rep2\n
+subGroup5 replicate Replicate NONE=none Rep1=Rep1 Rep2=Rep2\n
 subGroup6 signal Signal CPMs=CPMs counts=raw-counts\n
 dimensions dimX=treatment dimY=strain dimA=strand dimB=replicate dimC=signal\n
 filterComposite dimA dimB dimC\n
-sortOrder view=-\n
+sortOrder view=+ strand=+\n
 type bed 6 .\n
 \n
 \ttrack 5OH-Coverage\n
@@ -57,7 +57,7 @@ for strand in ${strands[@]}; do
                     \t\tparent 5OH-Coverage\n
                     \t\tsubGroups view=COV strain=$strain strand=$strand treatment=$treatment replicate=$rep signal=$signal\n
                     \t\tbigDataUrl 5OH/$fname\n
-                    \t\tshortLabel $strain.$treatment.$rep.$strand.$signal\n
+                    \t\tshortLabel $strain.$treatment.$rep\n
                     \t\tlongLabel 5OH-seq coverage strain=$strain treatment=$treatment strand=$strand replicate=$rep\n
                     \t\tmaxHeightPixels 30:30:10\n
                     \t\tcolor $color\n

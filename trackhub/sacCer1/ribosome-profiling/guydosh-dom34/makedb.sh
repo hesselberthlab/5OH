@@ -1,5 +1,11 @@
 #! /usr/bin/env bash
 
+# these are common among several tracks
+poscolor="202,0,32" # red
+negcolor="5,113,176" # blue
+
+# trackfile="$HUB/ribosome-footprints/trackDb.txt"
+
 mainstanza="
 track Ribosome-Footprints\n
 compositeTrack on\n
@@ -12,7 +18,7 @@ subGroup4 strand Strand pos=pos neg=neg\n
 subGroup5 size Size UNF=unfractionated SHR=short DIS=disome\n
 dimensions dimX=treatment dimY=strain dimA=strand dimB=size\n
 filterComposite dimA dimB\n
-sortOrder view=-\n
+sortOrder view=- strand=+\n
 type bed 6 .\n
 \n
 \ttrack Coverage\n
@@ -38,9 +44,9 @@ for acc in $accessions; do
     for strand in ${strands[@]}; do
 
         if [[ $strand == "pos" ]]; then
-            color="202,0,32"
+            color=$poscolor
         else
-            color="5,113,176"
+            color=$negcolor
         fi
 
         stanza="
@@ -48,7 +54,7 @@ for acc in $accessions; do
                 \t\tparent Coverage\n
                 \t\tsubGroups view=COV strain=$strain strand=$strand treatment=$treatment size=$size\n
                 \t\tbigDataUrl ribosome-profiling/guydosh-dom34/$acc.$strand.bw\n
-                \t\tshortLabel $strain.$treatment.$size.$strand\n
+                \t\tshortLabel $strain.$treatment.$size\n
                 \t\tlongLabel $acc $descrip $strand\n
                 \t\tmaxHeightPixels 30:30:10\n
                 \t\tcolor $color\n
