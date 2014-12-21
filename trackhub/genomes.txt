@@ -1,0 +1,2 @@
+genome sacCer1
+trackDb sacCer1/trackDb.txt

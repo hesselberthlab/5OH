@@ -1,0 +1,31 @@
+track RNAseq
+container multiWig
+aggregate transparentOverlay
+showSubtrackColorOnUi on
+shortLabel RNA-seq
+longLabel strand-specific RNA-seq (Levin et al. (2010) Nat Methods)
+type bigWig 0 1e-6
+viewLimits 0:1e-6
+maxHeightPixels 32:64:11
+visibility full
+
+    track pos
+    parent RNAseq
+    shortLabel pos strand
+    visibility full
+    bigDataUrl rna-seq/regev.pos.bw
+    color 202,0,32
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits 0:1e-6
+
+    track neg
+    parent RNAseq
+    shortLabel neg strand
+    visibility full
+    bigDataUrl rna-seq/regev.neg.rescale.bw
+    color 5,113,176
+    type bigWig
+    maxHeightPixels 32:64:11
+    viewLimits 0:1e-6
+
