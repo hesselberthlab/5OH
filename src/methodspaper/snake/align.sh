@@ -30,7 +30,7 @@ fi
 
 # Align to genome with bowtie, index with samtools
 zcat $fastq \
-    | bowtie $align_arg --sam $BOWTIEIDX -p 6 - \
+    | bowtie $align_arg --un ${fastq}.unaligned --sam $BOWTIEIDX -p 6 - \
         2> $alignstats \
     | samtools view -ShuF4 - \
     | samtools sort -o - $umibam.temp -m 8G \

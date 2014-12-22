@@ -11,14 +11,17 @@ DATA = "%s/projects/5OH/data/methodspaper/" % user       # location of raw data
 PROJECTDIR = "projects/5OH/results/methodspaper"         # directory for results
 RESULT = "%s/%s/" % (user, PROJECTDIR)                # full directory path for results
 RGRAPHS = "%srgraphs/" % RESULT                       # full directory path for R graph results
+PROPORTIONS = "%sproportions/" % RESULT               # full directory path for proportions results
 
 SAMPLES = "SP5 SP6 SP7 SP8 SP9 SP10 SP11 SP12 SP13 SP14 SP15 SP16 SP17 SP18 SP19 SP20 SP27 SP28 SP29".split() # sample names
+#SAMPLES = "SP7 SP8".split()  # Just a few to test this shit
 ASSEMBLY = "sacCer1"                                  # assembly for alignment (will be included in filename)
 UMI = "NNNNNNNN"                                      # UMI to be removed
-ALIGN_MODE = "all"                                   # name of alignment mode (will be included in filename)
-ALIGN_ARGS = "-a"                                # alignment arguments passed to bowtie
+ALIGN_MODE = "uniq"                                   # name of alignment mode (will be included in filename)
+ALIGN_ARGS = ""                                # alignment arguments passed to bowtie
 COVARGS = "-5 -bg -g"                                # genome coverage arguments passed to bedtools genomecov
-
+MRNABINS = "20"                                      # number of bins for mRNA binning; not actually dynamic yet
+UTRBINS = "2"                                        # number of bins for UTR binning; not actually dynamic yet
 
 # Consistent variables
 source = "/vol2/home/speach"                                                    # location of source scrimpts
@@ -37,8 +40,9 @@ RSCRIPTS = "%s/devel/5OH/src/R/" % source                                       
 GTF = "%s/ref/genomes/%s/sgdGene.%s.gtf" % (source, ASSEMBLY, ASSEMBLY)       # GTF file from database
 FASTA = "%s/ref/genomes/%s/%s.fa" % (source, ASSEMBLY, ASSEMBLY)              # Fasta of specific assembly
 FULLGFF = "%s/ref/genomes/sacCer1/sacCer1.fuller.bed" % source                # GFF file containing "all" gene species
-MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.mrna.20windows.bed" % source    # mRNA split into 20 bins
-UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.UTRs.2window.bed" % source       # UTRs split into 2 bins
+MRNAWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.snyder.mrna.%swindows.bed" % (source, MRNABINS)    # mRNA split into n bins
+UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.snyder.UTRs.%swindow.bed" % (source, UTRBINS)       # UTRs split into n bins
+MRNAFILE = "%s/ref/genomes/sacCer1/snyder-rnaseq-gene-models.bed" % source    # full mRNA file from snyder data
 
 # The input to the first rule should be the desired output of the full workflow
 rule all:
@@ -46,7 +50,8 @@ rule all:
 #    input: expand("{rgraphs}{sample}.align.{align_mode}.placeholder.txt", rgraphs=RGRAPHS, sample=SAMPLES, align_mode=ALIGN_MODE) 
 #    input: expand("{result}{sample}.{asal_text}alignstats.txt", result=RESULT, sample=SAMPLES, asal_text=ASAL_TEXT)
 #    input: expand("{result}{sample}.{asal_text}.strand.neg.CPMs.bg", result=RESULT, sample=SAMPLES, asal_text=ASAL_TEXT)
-     input: expand("{rgraphs}{sample}.{asal_text}.gffintersect.tab", rgraphs=RGRAPHS, sample=SAMPLES, asal_text=ASAL_TEXT)
+#     input: expand("{rgraphs}{sample}.{asal_text}.windows.tab", rgraphs=RGRAPHS, sample=SAMPLES, asal_text=ASAL_TEXT)
+     input: expand("{proportions}{sample}.{asal_text}.props.bed", proportions=PROPORTIONS, sample=SAMPLES, asal_text=ASAL_TEXT)
 
 # The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
@@ -55,6 +60,7 @@ rule trim_umi:
     output: DATA + "{sample}.umi.fq.gz"
     shell: "bash trim_umi.sh {input} {params} {output}"
 
+# Alignment scripts; align.sh = bowtie, align2.sh = bowtie2
 rule align:
     input: DATA + "{sample}.umi.fq.gz"
     params: BOWTIEIDX, ALIGN_ARGS
@@ -88,6 +94,12 @@ rule gene_bins:
     params: MRNAWINDOWS, UTRWINDOWS
     output: RGRAPHS + "{sample}." + ASAL_TEXT + ".windows.tab"
     shell: "bash gene_binning.sh {input} {params} {output}"
+
+rule proportions:
+    input: RESULT + "{sample}." + ASAL_TEXT + ".bam"
+    params: MRNAFILE, PROPORTIONS
+    output: PROPORTIONS + "{sample}." + ASAL_TEXT + ".props.bed"
+    shell: "bash calc_coverage_proportions.sh {input} {params} {output}"
 
 
 # TODO, R: - Make plots/summaries of gene species
