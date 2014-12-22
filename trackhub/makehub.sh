@@ -6,8 +6,10 @@ rst2html.py $rst $html
 
 url="http://amc-sandbox.ucdenver.edu/~jhessel/hubs/5OH/hub.txt"
 
+masterdb="sacCer1/trackDb.txt"
+
 cp -r * ~/public_html/hubs/5OH/
 
-hubCheck -verbose=2 $url
+hubCheck $url
 
 echo "hub is at $url"
