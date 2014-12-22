@@ -8,7 +8,7 @@ setwd(workingdir)
 sample <- "SP8"
 assembly <- "assembly-sacCer1"
 alignment <- "align-uniq"
-fileprefix <- paste(sample, assembly, alignment, sep=".")
+fileprefix <- paste(sample.name, assembly, alignment, sep=".")
 filename <- paste("peaks/", fileprefix, "_peaks.intersect.tab", sep="")
 
 df <- read.table(filename, col.names = c("peak.chrom", "peak.start", "peak.stop", "gene", "peak.reads", "site.proportion", "site.chrom", "site.position", "strand"))

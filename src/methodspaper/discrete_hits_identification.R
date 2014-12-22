@@ -37,8 +37,6 @@ get_prop_comp <- function(sample.name, assembly, alignment) {
   comp.props <- get_single_hits(df)
   return(comp.props)
 }
-  
-}
 
 # Alignment specifics
 workingdir = "~/projects/5OH/results/methodspaper/"

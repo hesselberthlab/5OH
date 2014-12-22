@@ -16,7 +16,7 @@ setwd(datadir)
 
 # parse data
 samplename <- "SP8.assembly-sacCer1.align-all"
-sampletable <- paste(samplename, ".FPKM_sum.std.tab", sep="")
+sampletable <- paste(samplename, ".FPKM_max.tab", sep="")
 df <- read.table(sampletable, header=FALSE,
                  col.names = c("chrom", "start", "stop", "gene", "FPKM", "strand", "OH.signal"))
 filtereddf <- subset(df, FPKM > 0.1 & OH.signal >0) # remove genes without FPKM data
@@ -74,7 +74,8 @@ summary(df.lm)
 ggsave(plot = full,
        filename = "SP8.assembly-sacCer1.align-all.FPKM_sum.std.pdf",
        height = 5,
-       width = 5)
+       width = 5,
+       useDingbats=FALSE)
 
 ggsave(plot=zoom, filename="SP8.assembly-sacCer1.align-all.FPKM_sum.std.zoom.pdf",
        height=7,
