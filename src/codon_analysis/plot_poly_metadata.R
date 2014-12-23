@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 library(reshape2)
 library(stringr)
 library(Cairo)
@@ -30,7 +31,11 @@ read_in_data <- function(filename) {
                variable.name = "polyaa")
   data$value <- as.numeric(data$value)
   
-  parsed_polyaa = as.data.frame(str_match(data$polyaa, "^([A-Z]|[A-Z][A-Z]|[A-Z][A-Z][A-Z]|[A-Z][A-Z][A-Z][A-Z])([1-9]|[1-9][0-9])$")[,-1])
+  letters = "([A-Z]|[A-Z][A-Z]|[A-Z][A-Z][A-Z]|[A-Z][A-Z][A-Z][A-Z])"
+  numbers = "([0-9]|[0-9][0-9])"
+  search = paste("^", letters, numbers, "$", sep="")
+  
+  parsed_polyaa = as.data.frame(str_match(data$polyaa, search)[,-1])
   colnames(parsed_polyaa) <- c("aa", "num")
   data <- cbind(data, parsed_polyaa)
   
@@ -103,12 +108,74 @@ plot_polydata_heatmap <- function(df) {
     scale_x_continuous(breaks=c(0,25,50,75,100,125,150), labels=c("-75", "-50", "-25", "0", "25", "50", "75"))
 }
 
+plot_polydata_heatmap_RKED <- function(df) {
+  df <- subset(df, num == 5) %>%
+    arrange(desc(value))
+  df$polyaa_sort <- factor(df$polyaa, c("RKED5", "RKD5","RKE5","RE5", "KE5", "RK5", "R5", "K5", "DE5", "D5", "E5", "ST5", "T5", "S5", "NQ5", "Q5", "N5", "P5", "L5", "I5", "H5", "A5"))
+  df <- subset(df, polyaa_sort != "NA")
+  ggplot(df, aes(x=index, y=polyaa_sort, fill=value)) +
+    geom_tile() +
+    scale_fill_gradient2(low="black", mid = "black", high="red", space = "rgb", name="Average\nCoverage") +
+    ylab("Poly Amino Acid Motif\n(Number of motifs)") +
+    xlab("Distance From Start of Motif (bp)") +
+    theme_bw() +
+    scale_x_continuous(breaks=c(0,25,50,75,100,125,150), labels=c("-75", "-50", "-25", "0", "25", "50", "75")) +
+    scale_y_discrete(breaks=motif.labels$motif, labels=motif.labels$label)
+}
+
+plot_polydata_heatmap_nosort <- function(df) {
+  #df <- subset(df, num == 5) %>%
+  #  arrange(desc(value))
+  #df$polyaa_sort <- factor(df$polyaa, c("KE5", "RK5", "R5", "K5", "DE5", "D5", "E5", "ST5", "T5", "S5", "NQ5", "Q5", "N5", "P5", "L5", "I5", "H5", "A5"))
+  #df <- subset(df, polyaa_sort != "NA")
+  ggplot(df, aes(x=index, y=polyaa, fill=value)) +
+    geom_tile() +
+    scale_fill_gradient2(low="black", mid = "black", high="red", space = "rgb", name="Average\nCoverage") +
+    ylab("Poly Amino Acid Motif\n(Number of motifs)") +
+    xlab("Distance From Start of Motif (bp)") +
+    theme_bw() +
+    scale_x_continuous(breaks=c(0,25,50,75,100,125,150), labels=c("-75", "-50", "-25", "0", "25", "50", "75")) +
+    scale_y_discrete(breaks=motif.labels$motif, labels=motif.labels$label)
+}
+
+# WT Human data
+setwd("~/projects/5OH/results/methodspaper/human")
+filename <- "SP30.assembly-canonicalhg19.align-uniq.polyall.avgs.csv"
+motif.labels <- read.table(paste(filename, "motifs", sep="."), header=TRUE, col.names = c("motif", "num.motifs")) %>%
+  mutate(label = paste(motif, "\n", "(", num.motifs, ")", sep=""))
+data <- read_in_data(filename)
+plot_polydata_heatmap_RKED(data)
+
 # WT DMSO data
 setwd("~/projects/5OH/results/methodspaper")
-data <- read_in_data_mm("SP8.assembly-sacCer1.align-all.polyKRDEmm.avgs.csv")
+filename <- "SP8.assembly-sacCer1.align-all.polyKRmm.avgs.csv"
+data <- read_in_data_mm(filename)
 plot_polydata_mm(data)
 
-labels <- read.table("SP8.assembly-sacCer1.align-all.polyKRmm.avgs.csv.motifs", header=TRUE)
+filename <- "SP8.assembly-sacCer1.align-uniq.polyall-RKED_mm2-10.avgs.csv"
+data <- read_in_data_mm(filename)
+plot_polydata_mm(data)
+
+filename <- "SP8.assembly-sacCer1.align-uniq.polyall-RKED_mm3-10.avgs.csv"
+data <- read_in_data_mm(filename)
+motif.labels <- read.table(paste(filename, "motifs", sep="."), header=TRUE, col.names = c("motif", "num.motifs")) %>%
+  mutate(label = paste(motif, "\n", "(", num.motifs, ")", sep=""))
+plot_polydata_mm(data)
+
+filename <- "SP8.assembly-sacCer1.align-uniq.polyall-RKED.avgs.csv"
+motif.labels <- read.table(paste(filename, "motifs", sep="."), header=TRUE, col.names = c("motif", "num.motifs")) %>%
+  mutate(label = paste(motif, "\n", "(", num.motifs, ")", sep=""))
+data <- read_in_data(filename)
+plot_polydata_heatmap(data)
+plot_polydata_heatmap_RKED(data)
+ssdata <- subset(data, aa %in% electrostatic & num == 5)
+plot_polydata_heatmap_nosort(ssdata)
+
+electrostatic <- c("R", "K", "RK", "RKE", "RKD", "RKED", "D", "E", "DE")
+
+num.motifs <- read.table(paste(filename, "motifs", sep="."), header=TRUE) %>%
+  arrange(mismatch)
+num.motifs
 
 gp <- plot_polydata_heatmap(data)
 

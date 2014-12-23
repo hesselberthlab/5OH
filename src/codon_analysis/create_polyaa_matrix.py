@@ -1,8 +1,10 @@
 #! /usr/bin/env python
 
 import sys
+import ipdb
 
 filename = sys.argv[1]
+polyaa_5 = sys.argv[2]
 
 prev_counts = ""
 
@@ -18,13 +20,14 @@ for line in open(filename):
         continue
     
     countarray = counts.split(",")
+    ipdb.set_trace()
     
     if strand == "-":
         countarray.reverse()
 
     tab_counts = "\t".join(countarray)
     
-    if polyaa_name == "E5":
+    if polyaa_name == polyaa_5 + "5":
         print tab_counts
     
     prev_countarray = countarray

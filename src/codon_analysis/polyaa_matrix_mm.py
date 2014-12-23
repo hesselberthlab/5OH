@@ -75,7 +75,8 @@ def avg_polyaa_matrices(mdict, csv_filename):
         df = pd.DataFrame(matrix)
         index_avgs = df.mean().tolist()
         avgs_dict[polyaa] = index_avgs
-        print "\t".join([polyaa.strip().split(":")[-1], str(len(matrix))])
+        #print "\t".join([polyaa.strip().split(":")[-1], str(len(matrix))])
+        print "\t".join([polyaa.strip(), str(len(matrix))])
 
        
         
