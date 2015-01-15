@@ -13,6 +13,7 @@ RESULT = "%s/%s/" % (user, PROJECTDIR)                # full directory path for 
 RGRAPHS = "%srgraphs/" % RESULT                       # full directory path for R graph results
 PROPORTIONS = "%sproportions/" % RESULT               # full directory path for proportions results
 MOTIFS = "%spolyaa_motifs/" % RESULT                  # full directory path for polyaa motif results
+PARSDIR = "%spars/" % RESULT                          # full directory path for pars results
 
 SAMPLES = "SP5 SP6 SP7 SP8 SP9 SP10 SP11 SP12 SP13 SP14 SP15 SP16 SP17 SP18 SP19 SP20 SP27 SP28 SP29".split() # sample names
 #SAMPLES = "SP8".split()                         # Just a few to test this shit
@@ -46,6 +47,7 @@ UTRWINDOWS = "%s/ref/genomes/sacCer1/sacCer1.snyder.UTRs.%swindow.bed" % (source
 MRNAFILE = "%s/ref/genomes/sacCer1/snyder-rnaseq-gene-models.bed" % source    # full mRNA file from snyder data
 POLYALL = "%s/ref/genomes/sacCer1/aa_motifs/poly-all_genes.bed" % source      # polyaa bedfile
 POLYAACODEDIR = "/vol2/home/speach/devel/5OH/src/codon_analysis"              # polyaa code directory
+PARSBG = "%s/ref/genomes/sacCer1/GSE22393_processed_merged_PARS_sacCer1.bg" % source       # PARS bg; Kertesz, Nature 2010
 
 # The input to the first rule should be the desired output of the full workflow
 # All my little commented bits are for looking at things I was interested
@@ -58,7 +60,8 @@ rule all:
 #    input: expand("{result}{sample}.{asal_text}.strand.neg.CPMs.bg", result=RESULT, sample=SAMPLES, asal_text=ASAL_TEXT)
 #     input: expand("{rgraphs}{sample}.{asal_text}.windows.tab", rgraphs=RGRAPHS, sample=SAMPLES, asal_text=ASAL_TEXT)
 #     input: expand("{proportions}{sample}.{asal_text}.props.bed", proportions=PROPORTIONS, sample=SAMPLES, asal_text=ASAL_TEXT)
-    input: expand("{motifs}{sample}.{asal_text}.poly-all.pdf", motifs=MOTIFS, sample=SAMPLES, asal_text=ASAL_TEXT)
+#    input: expand("{motifs}{sample}.{asal_text}.poly-all.pdf", motifs=MOTIFS, sample=SAMPLES, asal_text=ASAL_TEXT)
+    input: expand("{parsdir}{sample}.{asal_text}.strand.all.CPMs-PARS.tab", parsdir=PARSDIR, sample=SAMPLES, asal_text=ASAL_TEXT)
 
 # The order of these rules does not matter, but are currently written in order of execution
 rule trim_umi:
@@ -113,6 +116,12 @@ rule motifs:
     params: POLYALL, MOTIFS, POLYAACODEDIR
     output: MOTIFS + "{sample}." + ASAL_TEXT + ".poly-all.avgs.csv", MOTIFS + "{sample}." + ASAL_TEXT + ".poly-all.pdf"
     shell: "bash polyaa_motifs.sh {input} {params} {output}"
+
+rule compare_pars:
+    input: RESULT + "{sample}." + ASAL_TEXT + ".strand.all.CPMs.bg"
+    params: PARSBG, RSCRIPTS
+    output: PARSDIR + "{sample}." + ASAL_TEXT + ".strand.all.CPMs-PARS.tab"
+    shell: "bash compare_pars.sh {input} {params} {output}"
 
 # TODO, R: - Make plots/summaries of gene species
 #          - gene body plot
