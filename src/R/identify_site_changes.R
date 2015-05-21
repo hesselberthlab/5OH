@@ -6,7 +6,6 @@
 # 5OH pipeline - Plotting site changes between two datasets
 # Plots counts of individual 5OH sites in two datasets on opposing axes
 # Colors outliers above a fold-change threshold
-# TODO: Make prettier?  Control labelling?  Output site change stats somewhere useful?
 
 library(dplyr)
 library(ggplot2)
