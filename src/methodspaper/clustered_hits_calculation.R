@@ -19,12 +19,11 @@ df <- df %>%
   select(gene, site, site.proportion, peak.length, peak.reads) %>%
   arrange(desc(peak.length))
 
-# Removing duplciate entries because I'm too lazy to fix upstream code and make it stranded :(
+# Removing duplciate entries
 df <- df[!duplicated(df$site),]
 
 # List of discrete hits from discrete_hits_indentification.R; want to remove from list of clustered hits to ensure
 # no overlap. Currently hardcoded and put together outside of script due to initial manual validation in UCSC browser.
-# :(
 peaklist <- levels(read.table("peaks/peaklist.txt", col.names = c("gene"))$gene)
 
 # Site proportion threshold site to <= 0.15
