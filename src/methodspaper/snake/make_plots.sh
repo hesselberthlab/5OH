@@ -24,7 +24,7 @@ sampledescr="temporary"                                     # TODO: pass sample 
 
 ################################
 # DIFFUSE/DISCRETE SCATTER PLOTS
-# These plots look shitty/inaccurate at the moment.
+# These plots look subpar at the moment.
 #
 # minimum number of counts
 mincounts=(5 10 25 50 100)
