@@ -1,5 +1,5 @@
 # Barplot of poly-aa count data
-# refusing to dodge.  screw you R.
+# refusing to dodge.
 setwd("~/devel/5OH/src/codon_analysis")
 
 library(dplyr)
