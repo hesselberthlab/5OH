@@ -8,7 +8,7 @@
 # Discrete cleavages appear in top left (ie, RPS31); diffuse cleaveages appears at bottom right (ie, CBF5)
 
 # TODO: Currently, output of graphs is not like that seen in the interactive terminal, even when (presumably!)
-# operating on same data.  Figure this shit out.
+# operating on same data.  Figure this out.
 
 library(ggplot2)
 library(dplyr)
