@@ -16,7 +16,7 @@ MOTIFS = "%spolyaa_motifs/" % RESULT                  # full directory path for 
 PARSDIR = "%spars/" % RESULT                          # full directory path for pars results
 
 SAMPLES = "SP5 SP6 SP7 SP8 SP9 SP10 SP11 SP12 SP13 SP14 SP15 SP16 SP17 SP18 SP19 SP20 SP27 SP28 SP29".split() # sample names
-#SAMPLES = "SP8".split()                         # Just a few to test this shit
+#SAMPLES = "SP8".split()                         # Just a few to test
 ASSEMBLY = "sacCer1"                                 # assembly for alignment (will be included in filename)
 UMI = "NNNNNNNN"                                     # UMI to be removed
 ALIGN_MODE = "uniq"                                  # name of alignment mode (will be included in filename)
