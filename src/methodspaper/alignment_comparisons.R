@@ -22,6 +22,6 @@ samples %>%
   group_by(variable) %>%
   summarize(avg = mean(value))
 
-# Can visualize quick summary plots of alignment data; SP5 is a pretty shitty library
+# Can visualize quick summary plots of alignment data; SP5 is a subpar library
 ggplot(samples, aes(x=variable, y=value, fill=sample)) +
   geom_bar(stat="identity", position="dodge")
