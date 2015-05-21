@@ -1,6 +1,3 @@
-# I am actively and frequently editing this file to visualize and interpret data.
-# There's code all over the place.  Still... version contol.
-
 library(ggplot2)
 library(dplyr)
 library(reshape2)
@@ -39,7 +36,7 @@ barplot_RNAtypes <- function(data) {
           axis.text.x = element_text(angle = 45, hjust = 1))
 }
 
-### DO NOT CHANGE
+
 barplot_RNAtypes <- function(data) {
   bar_data <- data %.%
     group_by(gene,cat) %.%
@@ -107,7 +104,7 @@ wt <- read.table("ATTGGC_S4.intersect.tab",header=TRUE)
 plot_diffuse(subset(tm,cat=="mRNA" & count > 19 & ! gene == "RPL41B"), "WT +Tm; Rep1")
 plot_diffuse(subset(wt,cat=="mRNA" & count > 19 & ! gene == "RPL41B"),"WT DMSO; Rep1")
 
-### DO NOT EDIT ###
+
 plot_diffuse_lee_perfect <- function(data,sample_name){
   total_ratio <- data %.%
     group_by(gene) %.%
@@ -210,7 +207,6 @@ length(intersect(wt_top$gene, xrn1_top$gene))
 length(intersect(wt_top$gene, wt_tun_top$gene))
 
 # Ribosomal RNA summing
-# Why are 37-1 and 37-2 slightly different?  Am taking the higher of the two
 
 
 # Comparing normalization schemes
