@@ -78,9 +78,6 @@ def avg_polyaa_matrices(mdict, csv_filename):
         #print "\t".join([polyaa.strip().split(":")[-1], str(len(matrix))])
         print "\t".join([polyaa.strip(), str(len(matrix))])
 
-       
-        
-    #avgs_dict.pop("N5", None) # For some reason, "N5" has 131 indexes???  WHAT even... fix later.
     avgs_df = pd.DataFrame(avgs_dict)
     avgs_df.to_csv(index=False, path_or_buf=csv_filename)
 
