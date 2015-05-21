@@ -23,7 +23,6 @@ rfile=$5
 
 
 # Intersect bedgraph files with MRNA and UTR window files to generate R-compatible table
-# TODO: (Consider changing to Python at some point to make other people happy.)
 bedtools intersect -a $posbg -b $MRNAWINDOWS -wao \
     | awk 'BEGIN{OFS="\t"; print "chr\tstart\tstop\tcount\tgene\tbin\tstrand\tcat"} $10=="+" {split($8, a, "_"); print $1, $2, $3, $4, a[1], a[2],"+","exon"}' \
     > $rfile
